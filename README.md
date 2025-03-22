@@ -2,10 +2,23 @@
 This project was developed for 42 school. For comprehensive information regarding the requirements, please consult the PDF file in the subject folder of the repository. Furthermore, I have provided my notes and a concise summary below.
 
 ```diff
-+ keywords: internet relay chat
-+ early real time chat communication
++ keywords: early real time chat communication — how do I send data from one thing to another?
 + client server setup - run a client in your pc, that connects to a server. Everybody else connected to that server can communicate in real time.
 ```
+
+## Group Project Division
+
+This project was completed as a group effort. The tasks were divided as follows:
+
+### Person 1: Networking Layer (@shinckel)
+Socket Setup: Creating, binding, and listening on the server socket.
+Client Management: Handling connected clients, storing their details, and managing communication.
+Connection Handling: Using poll() to manage multiple simultaneous connections.
+
+### Person 2: Protocol and Features (@DaniSotti)
+Command Parsing: Implementing the IRC protocol commands (e.g., /join, /msg, /quit).
+Channel Management: Managing chat rooms, adding/removing users, and broadcasting messages.
+Authentication: Validating server passwords and implementing user roles (e.g., admin privileges).
 
 ## High-level Overview
 
@@ -93,7 +106,9 @@ Using poll(), the server can monitor multiple sockets (one for each client) and 
 | **HexChat** | `ubuntu VM` `sudo apt update` `sudo apt install hexchat` | HexChat will try to open a graphical user interface (GUI), therefore, VM must be initialized with X11 forwarding enabled — install XQuartz, then enable X11 forwarding in SSH `ssh -X ubuntu@your_vm_ip`. Run `hexchat`. |
 | **SSL** | | Secure Sockets Layer. TLS: transport layer security. |
 | **socket** | | In the context of the IRC server, a socket is the mechanism that enables communication between the server and the connected clients (e.g., HexChat). They allow the server to: accept connections from multiple clients, exchange real-time messages, bind to a specific port for clients to connect, implement the IRC protocol for communication. |
+| **Winsock** | | There is no builtin networking in C++ (python and C# have it). You will have to use the builtin operating system API (e.g. Winsock). |
 
 ### References
 [Internet Relay Chat: Communicate Outside Of Normal Channels](https://www.youtube.com/watch?v=FxZ2epcJ9l0)<br />
 [Networking in C++](https://www.youtube.com/watch?v=jS9rBienEFQ)
+[Creating a Simple TCP Server in C++ using Winsock](https://medium.com/@tharunappu2004/creating-a-simple-tcp-server-in-c-using-winsock-b75dde86dd39)
