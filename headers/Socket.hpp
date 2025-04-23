@@ -6,7 +6,7 @@
 /*   By: shinckel <shinckel@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 17:52:49 by shinckel          #+#    #+#             */
-/*   Updated: 2025/03/22 21:02:00 by shinckel         ###   ########.fr       */
+/*   Updated: 2025/04/08 13:05:58 by shinckel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # include <map>
 # include <netinet/in.h>
 # include <arpa/inet.h>
+# include <stdexcept> // For std::runtime_error?
 
 # include "Error.hpp"
 # include "Manager.hpp"
@@ -34,13 +35,14 @@
 # include "Client.hpp"
 
 # define LOG(x) std::cout << x << std::endl;
+# define ERROR(x) std::cerr << "\033[1;41m " + std::string(x) + " \033[0m" << std::endl;
 
 #define BACKLOG 10 // Number of pending connections queu
 
 /*
 Server Socket:
 
-The server creates a socket and binds it to a specific port (e.g., 6667).
+The server creates a socket and binds it to a specific port (e.g. 6667).
 It listens for incoming connections from clients.
 Client Socket:
 
@@ -62,10 +64,13 @@ class Socket {
     void startServer(std::string port, std::string password);
 
   private:
-    std::string _port;
-    std::string _pass;
+    std::string _port; // bind socket to a specific port
+    std::string _pass; // authenticate clients when they connect to the server
 
-    void ParsePortPassword();
+    void  createSocket(int &server_fd);
+    void  bindSocket(int server_fd, const std::string &port);
+    void  startListening(int server_fd);
+    void  acceptConnections(int server_fd);
 };
 
 #endif

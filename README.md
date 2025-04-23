@@ -17,8 +17,7 @@ Connection Handling: Using poll() to manage multiple simultaneous connections.
 
 ### Person 2: Protocol and Features (@DaniSotti)
 Command Parsing: Implementing the IRC protocol commands (e.g., /join, /msg, /quit).
-Channel Management: Managing chat rooms, adding/removing users, and broadcasting messages.
-Authentication: Validating server passwords and implementing user roles (e.g., admin privileges).
+Channel Management: Managing chat rooms, adding/removing users, and broadcasting messages. Authentication: Validating server passwords and implementing user roles (e.g., admin privileges).
 
 ## High-level Overview
 
@@ -112,3 +111,5 @@ Using poll(), the server can monitor multiple sockets (one for each client) and 
 [Internet Relay Chat: Communicate Outside Of Normal Channels](https://www.youtube.com/watch?v=FxZ2epcJ9l0)<br />
 [Networking in C++](https://www.youtube.com/watch?v=jS9rBienEFQ)
 [Creating a Simple TCP Server in C++ using Winsock](https://medium.com/@tharunappu2004/creating-a-simple-tcp-server-in-c-using-winsock-b75dde86dd39)
+[C++ Network Programming Part 1: Sockets](https://www.youtube.com/watch?v=gntyAFoZp-E)
+[C++ Network Programming Part 2: TCP & UDP](https://www.youtube.com/watch?v=sXW_sNGvqcU)
