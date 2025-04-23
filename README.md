@@ -17,7 +17,11 @@ Connection Handling: Using poll() to manage multiple simultaneous connections.
 
 ### Person 2: Protocol and Features (@DaniSotti)
 Command Parsing: Implementing the IRC protocol commands (e.g., /join, /msg, /quit).
-Channel Management: Managing chat rooms, adding/removing users, and broadcasting messages. Authentication: Validating server passwords and implementing user roles (e.g., admin privileges).
+Channel Management: Managing chat rooms, adding/removing users, and broadcasting messages.
+
+### Person 3: Protocol and Features (@zecalejo)
+Authentication: Validating server passwords and implementing user roles (e.g., admin privileges).
+Tests: checking for errors and fixing bugs.
 
 ## High-level Overview
 
