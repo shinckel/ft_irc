@@ -32,6 +32,9 @@ Tests: checking for errors and fixing bugs.
 1. You must not implement server-to-server communication.
 2. Your executable will be run as follows: `./ircserv <port> <password>`
 3. IRC server is a program that manages connection between IRC clients.
+4. The Socket class is responsible for managing the server socket and accepting connections: `Socket.cpp` file focused on socket setup and server lifecycle management, `SocketData.cpp` handle client-specific operations.
+5. The Client class represents individual connected clients and provides methods for communication.
+6. Together, they form a server-client architecture where the Socket manages the server-side operations, and the Client handles the communication with each connected.
 
 ### Server Socket
 The server creates a socket and binds it to a specific port (e.g., 6667). It listens for incoming connections from clients.
@@ -109,7 +112,9 @@ Using poll(), the server can monitor multiple sockets (one for each client) and 
 | **HexChat** | `ubuntu VM` `sudo apt update` `sudo apt install hexchat` | HexChat will try to open a graphical user interface (GUI), therefore, VM must be initialized with X11 forwarding enabled — install XQuartz, then enable X11 forwarding in SSH `ssh -X ubuntu@your_vm_ip`. Run `hexchat`. |
 | **SSL** | | Secure Sockets Layer. TLS: transport layer security. |
 | **socket** | | In the context of the IRC server, a socket is the mechanism that enables communication between the server and the connected clients (e.g., HexChat). They allow the server to: accept connections from multiple clients, exchange real-time messages, bind to a specific port for clients to connect, implement the IRC protocol for communication. |
-| **Winsock** | | There is no builtin networking in C++ (python and C# have it). You will have to use the builtin operating system API (e.g. Winsock). |
+| **Winsock** | `shortcut for windows sockets API - WSA` | There is no builtin networking in C++ (python and C# have it). You will have to use the builtin operating system API (e.g. Winsock) to make use and interact with the resources of the OS — windows core components of the sockets come in the format of a dll file. |
+
+
 
 ### References
 [Internet Relay Chat: Communicate Outside Of Normal Channels](https://www.youtube.com/watch?v=FxZ2epcJ9l0)<br />

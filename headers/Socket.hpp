@@ -41,17 +41,16 @@
 
 /*
 Server Socket:
-
 The server creates a socket and binds it to a specific port (e.g. 6667).
 It listens for incoming connections from clients.
+
 Client Socket:
-
 Each client (HexChat) creates its own socket to connect to the server's socket.
+
 Data Exchange:
-
 Once connected, the server and client use their respective sockets to exchange messages (e.g., joining channels, sending private messages).
-Non-Blocking I/O:
 
+Non-Blocking I/O:
 Using poll(), the server can monitor multiple sockets (one for each client) and handle data as it arrives, ensuring efficient communication.
 */
 
@@ -70,7 +69,7 @@ class Socket {
     void  createSocket(int &server_fd);
     void  bindSocket(int server_fd, const std::string &port);
     void  startListening(int server_fd);
-    void  acceptConnections(int server_fd);
+    void  acceptClientConnections(int server_fd);
 };
 
 #endif

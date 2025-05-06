@@ -54,41 +54,24 @@ void Socket::startListening(int server_fd) {
   LOG("Server is listening for incoming connections");
 }
 
-void Socket::acceptConnections(int server_fd) {
-  while (true) {
-    struct sockaddr_in client_addr;
-    socklen_t client_len = sizeof(client_addr);
-    int client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
-    if (client_fd == -1) {
-      std::cerr << "Accept failed" << std::endl;
-      continue;
-    }
-
-    std::cout << "New connection from "
-              << inet_ntoa(client_addr.sin_addr) << ":"
-              << ntohs(client_addr.sin_port) << std::endl;
-
-    close(client_fd);
-  }
-}
-
 void Socket::startServer(std::string port, std::string password) {
   int server_fd;
-  (void)password;
+  (void)password; // TODO: how to authenticate password?
 
   try {
-    createSocket(server_fd);       // Step 1: Create a socket
-    bindSocket(server_fd, port);   // Step 2: Bind the socket to a port
-    startListening(server_fd);     // Step 3: Listen for incoming connections
-    acceptConnections(server_fd);  // Step 4: Accept incoming connections
+    createSocket(server_fd);       // step 1: create a socket
+    bindSocket(server_fd, port);   // step 2: bind the socket to a port
+    startListening(server_fd);     // step 3: listen for incoming connections
+    // delegate client handling to SocketData...
+    acceptClientConnections(server_fd);  // step 4: handle incoming client connections
   } catch (const std::runtime_error &e) {
     ERROR(e.what());
     if (server_fd != -1) {
-      close(server_fd); // Ensure the socket is closed on error
+      close(server_fd); // ensure the socket is closed on error
     }
     return;
   }
 
-  // Close server socket after exiting the loop
+  // close server socket after exiting the loop
   close(server_fd);
 }
