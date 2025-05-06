@@ -122,3 +122,4 @@ Using poll(), the server can monitor multiple sockets (one for each client) and 
 [Creating a Simple TCP Server in C++ using Winsock](https://medium.com/@tharunappu2004/creating-a-simple-tcp-server-in-c-using-winsock-b75dde86dd39)
 [C++ Network Programming Part 1: Sockets](https://www.youtube.com/watch?v=gntyAFoZp-E)
 [C++ Network Programming Part 2: TCP & UDP](https://www.youtube.com/watch?v=sXW_sNGvqcU)
+[GameNetworkingSockets](https://github.com/ValveSoftware/GameNetworkingSockets/tree/master/examples)
