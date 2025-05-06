@@ -116,8 +116,8 @@ Using poll(), the server can monitor multiple sockets (one for each client) and 
 | **Streaming socket** | `SOCK_STREAM -> TCP` | |
 | **Datagram socket** | `SOCK_DGRAM -> UDP` | Less secure, doesn't require connection. Therefore, it is faster. |
 | **SSL** | | Secure Sockets Layer. TLS: transport layer security. |
-| **Server functions** | | |
-| **Client functions** | | |
+| **Server functions** | x | ![Screenshot 2025-05-06 at 11 37 51](https://github.com/user-attachments/assets/99e6a185-6096-4b21-8202-cb4b03b7bfcf) |
+| **Client functions** | x | ![Screenshot 2025-05-06 at 11 39 49](https://github.com/user-attachments/assets/ba49eca6-257a-4322-8805-432c51128a7d) |
 
 ### References
 [Internet Relay Chat: Communicate Outside Of Normal Channels](https://www.youtube.com/watch?v=FxZ2epcJ9l0)<br />
