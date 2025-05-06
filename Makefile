@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: shinckel <shinckel@student.42lisboa.com    +#+  +:+       +#+         #
+#    By: shinckel <shinckel@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/26 21:27:04 by shinckel          #+#    #+#              #
-#    Updated: 2025/03/22 18:12:48 by shinckel         ###   ########.fr        #
+#    Updated: 2025/05/06 18:17:43 by shinckel         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,8 @@ NAME = ircserv
 
 # SRCS =	srcs/test.cpp
 SRCS =	srcs/main.cpp \
-				srcs/Socket.cpp
+		srcs/Socket.cpp \
+		srcs/SocketData.cpp
 
 CXX = c++
 
