@@ -23,11 +23,11 @@
 # include <netdb.h>
 # include <vector>
 # include <sstream>
-# include <algorithm>
+# include <algorithm> // e.g. std::transform
 # include <map>
 # include <netinet/in.h>
 # include <arpa/inet.h>
-# include <stdexcept> // For std::runtime_error?
+# include <stdexcept> // e.g. std::runtime_error? is it necessary?
 
 # include "Error.hpp"
 # include "Manager.hpp"
@@ -66,8 +66,8 @@ class Socket {
     std::string _port; // bind socket to a specific port
     std::string _pass; // authenticate clients when they connect to the server
 
-    void  createSocket(int &server_fd);
-    void  bindSocket(int server_fd, const std::string &port);
+    void  createSocket(int &server_fd, struct addrinfo *&server_info, const std::string &port);
+    void  bindSocket(int server_fd, struct addrinfo *server_info);
     void  startListening(int server_fd);
     void  acceptClientConnections(int server_fd);
 };

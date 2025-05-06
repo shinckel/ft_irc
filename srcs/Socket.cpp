@@ -21,25 +21,31 @@ Socket::~Socket() {
   LOG("Socket destroyed");
 }
 
-void Socket::createSocket(int &server_fd) {
-  // server_fd = socket(-1, SOCK_STREAM, 0); // force an error for checking LOG
-  server_fd = socket(AF_INET, SOCK_STREAM, 0);
+void Socket::createSocket(int &server_fd, struct addrinfo *&server_info, const std::string &port) {
+  struct addrinfo hints;
+  std::memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;      // support both IPv4 and IPv6
+  hints.ai_socktype = SOCK_STREAM;  // use TCP stream sockets
+  hints.ai_flags = AI_PASSIVE;      // bind to wildcard address
+
+  int status = getaddrinfo(NULL, port.c_str(), &hints, &server_info); // use getaddrinfo to resolve address
+  if (status != 0) {
+    throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(status)));
+  }
+  
+  // server_fd = socket(-1, SOCK_STREAM, 0); // force an error for checking ERROR log
+  server_fd = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
   if (server_fd == -1) {
+    freeaddrinfo(server_info); // don't forget to free addrinfo on error
     throw std::runtime_error("Socket creation failed");
   }
   LOG("Socket created successfully");
 }
 
-void Socket::bindSocket(int server_fd, const std::string &port) {
-  // const std::string port2 = "80"; // Port 80 is often restricted or already in use, force an error for checking LOG
-  // OR pass 80 as first argument, much easier
-  struct sockaddr_in server_addr;
-  std::memset(&server_addr, 0, sizeof(server_addr));
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_addr.s_addr = INADDR_ANY; // bind to all available interfaces
-  server_addr.sin_port = htons(atoi(port.c_str())); // convert port to network byte order
-
-  if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+void Socket::bindSocket(int server_fd, struct addrinfo *server_info) {
+  // pass port 80 as first argument when running the executable for testing ERROR log
+  if (bind(server_fd, server_info->ai_addr, server_info->ai_addrlen) == -1) {
+    freeaddrinfo(server_info);
     throw std::runtime_error("Bind failed on port " + port);
   }
   LOG("Socket bound to port " + port);
@@ -47,7 +53,7 @@ void Socket::bindSocket(int server_fd, const std::string &port) {
 
 void Socket::startListening(int server_fd) {
   (void)server_fd;
-  // if (listen(-1, BACKLOG) == -1) { // invalid file descriptor, force error for checking LOG
+  // if (listen(-1, BACKLOG) == -1) { // invalid file descriptor, force error for checking ERROR log
   if (listen(server_fd, BACKLOG) == -1) {
     throw std::runtime_error("Listen failed");
   }
@@ -55,15 +61,17 @@ void Socket::startListening(int server_fd) {
 }
 
 void Socket::startServer(std::string port, std::string password) {
-  int server_fd;
+  int server_fd = -1;
+  struct addrinfo *server_info = nullptr;
   (void)password; // TODO: how to authenticate password?
 
   try {
-    createSocket(server_fd);       // step 1: create a socket
-    bindSocket(server_fd, port);   // step 2: bind the socket to a port
-    startListening(server_fd);     // step 3: listen for incoming connections
+    createSocket(server_fd, server_info, port); // step 1: create a socket
+    bindSocket(server_fd, server_info);         // step 2: bind the socket to a port
+    freeaddrinfo(server_info);
+    startListening(server_fd);                  // step 3: listen for incoming connections
     // delegate client handling to SocketData...
-    acceptClientConnections(server_fd);  // step 4: handle incoming client connections
+    acceptClientConnections(server_fd);         // step 4: handle incoming client connections
   } catch (const std::runtime_error &e) {
     ERROR(e.what());
     if (server_fd != -1) {

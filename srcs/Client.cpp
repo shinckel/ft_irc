@@ -12,40 +12,109 @@
 
 #include "../headers/Client.hpp"
 
-Client::Client(int fd, const std::string& ip, int port)
-    : _fd(fd), _ip(ip), _port(port) {
-    LOG("New client connected: " + ip + ":" + std::to_string(port));
+Client::Client(int id) : _id(id), _nickname(""), _username(""), _channel(""), _lastTriedNickname("") {
+    std::cout << "Client created with ID: " << id << std::endl;
 }
 
-Client::~Client() {
-    LOG("Client disconnected: " + _ip + ":" + std::to_string(_port));
-    close(_fd);
+Client::~Client() {}
+
+Client &Client::operator=(const Client &src) {
+    if (this != &src) {
+        _id = src._id;
+        _nickname = src._nickname;
+        _username = src._username;
+        _channel = src._channel;
+        _lastTriedNickname = src._lastTriedNickname;
+        _commands = src._commands;
+    }
+    return *this;
 }
 
-int Client::getFd() const {
-    return _fd;
+Client::Client(const Client &src) {
+    *this = src;
 }
 
-std::string Client::getIp() const {
-    return _ip;
+// Getters
+int Client::getId() const {
+    return _id;
 }
 
-int Client::getPort() const {
-    return _port;
+std::stringstream &Client::getBuffer() {
+    return _buffer;
 }
 
-void Client::sendMessage(const std::string& message) const {
-    if (send(_fd, message.c_str(), message.size(), 0) == -1) {
-        std::cerr << "Failed to send message to client: " << _ip << std::endl;
+std::string &Client::getNickname() {
+    return _nickname;
+}
+
+std::string &Client::getUsername() {
+    return _username;
+}
+
+std::vector<std::string> Client::getCommands() const {
+    return _commands;
+}
+
+std::string &Client::getChannel() {
+    return _channel;
+}
+
+std::string &Client::getLastTriedNickname() {
+    return _lastTriedNickname;
+}
+
+std::string Client::getClientPrefix() const {
+    return _nickname + "!" + _username + "@" + _hostname;
+}
+
+// Setters
+void Client::setNickname(const std::string &nickname) {
+    _nickname = nickname;
+}
+
+void Client::setUsername(const std::string &username) {
+    _username = username;
+}
+
+void Client::setHostname(const std::string &hostname) {
+    _hostname = hostname;
+}
+
+void Client::setLastTriedNickname(const std::string &lastNickname) {
+    _lastTriedNickname = lastNickname;
+}
+
+void Client::setCommand(const std::string &command) {
+    _commands.clear();
+    std::string cmd = command;
+
+    if (!cmd.empty() && cmd[0] == '/') {
+        cmd.erase(0, 1); // remove leading '/'
+    }
+
+    size_t spacePos = cmd.find(' ');
+    if (spacePos != std::string::npos) {
+        std::string commandName = cmd.substr(0, spacePos);
+        std::transform(commandName.begin(), commandName.end(), commandName.begin(), ::toupper); // convert to uppercase
+        _commands.push_back(commandName);
+        _commands.push_back(cmd.substr(spacePos + 1));
+    } else {
+        std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // convert to uppercase
+        _commands.push_back(cmd);
     }
 }
 
-std::string Client::receiveMessage() const {
-    char buffer[1024];
-    std::memset(buffer, 0, sizeof(buffer));
-    int bytesReceived = recv(_fd, buffer, sizeof(buffer) - 1, 0);
-    if (bytesReceived <= 0) {
-        return "";
+void Client::setRegularCommand(const std::string &command) {
+    _commands.clear();
+    std::string cmd = command;
+
+    if (!cmd.empty() && cmd[0] == '/') {
+        cmd.erase(0, 1); // remove leading '/'
     }
-    return std::string(buffer, bytesReceived);
+
+    _commands.push_back(cmd);
+}
+
+void Client::setChannel(const std::string &channel) {
+    _channel = channel;
 }
