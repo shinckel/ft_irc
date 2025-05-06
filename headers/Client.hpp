@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shinckel <shinckel@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: shinckel <shinckel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 17:45:42 by shinckel          #+#    #+#             */
-/*   Updated: 2025/04/23 17:45:42 by shinckel         ###   ########.fr       */
+/*   Updated: 2025/05/06 18:01:53 by shinckel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,11 @@ private:
     std::string                 _hostname;          // client's hostname
 
 public:
-    Client() = default;
-    explicit Client(int id);
+    Client() {};
+    Client(int id);
     Client(const Client &src);
     Client &operator=(const Client &src);
-    ~Client();
+    ~Client() {};
 
     std::string                 &getChannel();
     std::string                 &getNickname();

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shinckel <shinckel@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: shinckel <shinckel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 17:52:49 by shinckel          #+#    #+#             */
-/*   Updated: 2025/04/08 13:06:44 by shinckel         ###   ########.fr       */
+/*   Updated: 2025/05/06 18:03:32 by shinckel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,9 @@ void Socket::bindSocket(int server_fd, struct addrinfo *server_info) {
   // pass port 80 as first argument when running the executable for testing ERROR log
   if (bind(server_fd, server_info->ai_addr, server_info->ai_addrlen) == -1) {
     freeaddrinfo(server_info);
-    throw std::runtime_error("Bind failed on port " + port);
+    throw std::runtime_error("Bind failed on port");
   }
-  LOG("Socket bound to port " + port);
+  LOG("Socket bound to port");
 }
 
 void Socket::startListening(int server_fd) {
@@ -62,7 +62,7 @@ void Socket::startListening(int server_fd) {
 
 void Socket::startServer(std::string port, std::string password) {
   int server_fd = -1;
-  struct addrinfo *server_info = nullptr;
+  struct addrinfo *server_info = NULL;
   (void)password; // TODO: how to authenticate password?
 
   try {

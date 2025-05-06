@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shinckel <shinckel@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: shinckel <shinckel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 13:00:00 by shinckel          #+#    #+#             */
-/*   Updated: 2025/04/08 13:30:00 by shinckel         ###   ########.fr       */
+/*   Updated: 2025/05/06 18:02:11 by shinckel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,6 @@
 Client::Client(int id) : _id(id), _nickname(""), _username(""), _channel(""), _lastTriedNickname("") {
     std::cout << "Client created with ID: " << id << std::endl;
 }
-
-Client::~Client() {}
 
 Client &Client::operator=(const Client &src) {
     if (this != &src) {
