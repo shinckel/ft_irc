@@ -113,8 +113,7 @@ Using poll(), the server can monitor multiple sockets (one for each client) and 
 | **SSL** | | Secure Sockets Layer. TLS: transport layer security. |
 | **socket** | | In the context of the IRC server, a socket is the mechanism that enables communication between the server and the connected clients (e.g., HexChat). They allow the server to: accept connections from multiple clients, exchange real-time messages, bind to a specific port for clients to connect, implement the IRC protocol for communication. |
 | **Winsock** | `shortcut for windows sockets API - WSA` | There is no builtin networking in C++ (python and C# have it). You will have to use the builtin operating system API (e.g. Winsock) to make use and interact with the resources of the OS — windows core components of the sockets come in the format of a dll file. |
-
-
+| **OSI** | `Open Systems Interconnection` | Send data from one application to another application across a network. Application layer: software. Session layer: usages of OS API, interact with resources from operating system. Goes down to the physical layer: hardware. |
 
 ### References
 [Internet Relay Chat: Communicate Outside Of Normal Channels](https://www.youtube.com/watch?v=FxZ2epcJ9l0)<br />
