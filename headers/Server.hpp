@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SOCKET_HPP
-#define SOCKET_HPP
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
 # include <cstring>
 # include <stdlib.h>
@@ -45,10 +45,10 @@ class Client; // forward declaration
 
 // this is the starting point: create a socket to speak to other programs using standard Unix file descriptors
 // a socket is an endpoint for communication between two machines over a network
-class Socket {
+class Server {
   public:
-    Socket(std::string port, std::string password);
-    ~Socket();
+    Server(std::string port, std::string password);
+    ~Server();
     void startServer(std::string port, std::string password);
 
   private:

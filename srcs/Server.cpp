@@ -10,18 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../headers/Socket.hpp"
+#include "../headers/Server.hpp"
 
-Socket::Socket(std::string port, std::string password): _port(port), _pass(password) {
+Server::Server(std::string port, std::string password): _port(port), _pass(password) {
   LOG("Socket initialized");
   startServer(port, password);
 }
 
-Socket::~Socket() {
+Server::~Server() {
   LOG("Socket destroyed");
 }
 
-void Socket::createSocket(int &server_fd, struct addrinfo *&server_info, const std::string &port) {
+void Server::createSocket(int &server_fd, struct addrinfo *&server_info, const std::string &port) {
   struct addrinfo hints;
   std::memset(&hints, 0, sizeof(hints));
   hints.ai_family = AF_UNSPEC;      // support both IPv4 and IPv6
@@ -42,7 +42,7 @@ void Socket::createSocket(int &server_fd, struct addrinfo *&server_info, const s
   LOG("Socket created successfully");
 }
 
-void Socket::bindSocket(int server_fd, struct addrinfo *server_info) {
+void Server::bindSocket(int server_fd, struct addrinfo *server_info) {
   // pass port 80 as first argument when running the executable for testing ERROR log
   if (bind(server_fd, server_info->ai_addr, server_info->ai_addrlen) == -1) {
     freeaddrinfo(server_info);
@@ -51,7 +51,7 @@ void Socket::bindSocket(int server_fd, struct addrinfo *server_info) {
   LOG("Socket bound to port");
 }
 
-void Socket::startListening(int server_fd) {
+void Server::startListening(int server_fd) {
   (void)server_fd;
   // if (listen(-1, MAX_CLIENTS) == -1) { // invalid file descriptor, force error for checking ERROR log
   if (listen(server_fd, MAX_CLIENTS) == -1) {
@@ -60,7 +60,7 @@ void Socket::startListening(int server_fd) {
   LOG("Server is listening for incoming connections");
 }
 
-void Socket::startServer(std::string port, std::string password) {
+void Server::startServer(std::string port, std::string password) {
   int server_fd = -1;
   struct addrinfo *server_info = NULL;
   (void)password; // TODO: how to authenticate password?

@@ -13,14 +13,14 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "Socket.hpp"
+#include "Server.hpp"
 #include <sstream>
 #include <vector>
 #include <string>
 
 // Represents a connected client
 // Each connected client is represented by an instance of the Client class
-// When a client connects to the server, the accept() call in the Socket class returns a new file descriptor (client_fd) for the client
+// When a client connects to the server, the accept() call in the Server class returns a new file descriptor (client_fd) for the client
 // This file descriptor is used to communicate with the client
 class Client {
 private:

@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../headers/Socket.hpp"
+#include "../headers/Server.hpp"
 
-void Socket::handleClient(int client_fd) {
+void Server::handleClient(int client_fd) {
   char buffer[1024];
   std::memset(buffer, 0, sizeof(buffer));
 
@@ -44,7 +44,7 @@ void Socket::handleClient(int client_fd) {
   send(client_fd, message.c_str(), message.size(), 0);
 }
 
-void Socket::acceptClientConnections(int server_fd) {
+void Server::acceptClientConnections(int server_fd) {
   struct pollfd fds[MAX_CLIENTS];
   int nfds = 1;
 
