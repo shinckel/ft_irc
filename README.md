@@ -63,7 +63,7 @@ void  Socket::startServer(std::string port, std::string password) {
   }
 
   // step 3: listen for incoming connections
-  if (listen(server_fd, BACKLOG) == -1) {
+  if (listen(server_fd, MAX_CLIENTS) == -1) {
     std::cerr << "Listen failed" << std::endl;
     close(server_fd);
     exit(EXIT_FAILURE);

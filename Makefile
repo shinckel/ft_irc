@@ -14,8 +14,9 @@ NAME = ircserv
 
 # SRCS =	srcs/test.cpp
 SRCS =	srcs/main.cpp \
-		srcs/Socket.cpp \
-		srcs/SocketData.cpp
+				srcs/Socket.cpp \
+				srcs/SocketData.cpp \
+				srcs/Client.cpp
 
 CXX = c++
 

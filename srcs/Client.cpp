@@ -12,7 +12,8 @@
 
 #include "../headers/Client.hpp"
 
-Client::Client(int id) : _id(id), _nickname(""), _username(""), _channel(""), _lastTriedNickname("") {
+Client::Client(int id)
+    : _id(id), _nickname(""), _lastTriedNickname(""), _username(""), _commands(), _channel(""), _hostname("") {
     std::cout << "Client created with ID: " << id << std::endl;
 }
 

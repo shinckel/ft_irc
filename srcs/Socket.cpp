@@ -53,8 +53,8 @@ void Socket::bindSocket(int server_fd, struct addrinfo *server_info) {
 
 void Socket::startListening(int server_fd) {
   (void)server_fd;
-  // if (listen(-1, BACKLOG) == -1) { // invalid file descriptor, force error for checking ERROR log
-  if (listen(server_fd, BACKLOG) == -1) {
+  // if (listen(-1, MAX_CLIENTS) == -1) { // invalid file descriptor, force error for checking ERROR log
+  if (listen(server_fd, MAX_CLIENTS) == -1) {
     throw std::runtime_error("Listen failed");
   }
   LOG("Server is listening for incoming connections");
