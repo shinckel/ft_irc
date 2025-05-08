@@ -13,12 +13,22 @@
 #include "../headers/Server.hpp"
 
 Server::Server(std::string port, std::string password): _port(port), _pass(password) {
-  LOG("Socket initialized");
   startServer(port, password);
 }
 
 Server::~Server() {
   LOG("Socket destroyed");
+}
+
+void  Server::checkArguments(const std::string &port, const std::string &password) {
+  if (port.empty() || atoi(port.c_str()) <= MIN_PORT || atoi(port.c_str()) > MAX_PORT) {
+    throw std::runtime_error("Invalid port number. It should be between 1024 and 65535");
+  }
+  if (password.empty() || password.find_first_not_of(" \t\n\r") == std::string::npos) {
+    throw std::runtime_error("Invalid password: Password cannot be empty or whitespace only");
+  }
+
+  LOG("Arguments are valid, ready to start server");
 }
 
 void Server::createSocket(int &server_fd, struct addrinfo *&server_info, const std::string &port) {
@@ -66,6 +76,7 @@ void Server::startServer(std::string port, std::string password) {
   (void)password; // TODO: how to authenticate password?
 
   try {
+    checkArguments(port, password);             // step 0: check arguments validity
     createSocket(server_fd, server_info, port); // step 1: create a socket
     bindSocket(server_fd, server_info);         // step 2: bind the socket to a port
     freeaddrinfo(server_info);
@@ -77,7 +88,7 @@ void Server::startServer(std::string port, std::string password) {
     if (server_fd != -1) {
       close(server_fd); // ensure the socket is closed on error
     }
-    return;
+    exit(EXIT_FAILURE);
   }
 
   // close server socket after exiting the loop

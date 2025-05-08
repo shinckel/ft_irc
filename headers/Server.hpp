@@ -39,7 +39,10 @@
 # define LOG(x) std::cout << x << std::endl;
 # define ERROR(x) std::cerr << "\033[1;41m " + std::string(x) + " \033[0m" << std::endl;
 
-#define MAX_CLIENTS 10 // define a constant for the maximum number of clients
+#define MAX_CLIENTS 10    // define a constant for the maximum number of clients
+#define MAX_PORT 65535    // The maximum port number for TCP and UDP in the Internet Assigned Numbers Authority (IANA) range is 65535
+#define MIN_PORT 1023     // ports in the range from 0 to 1023 are known as well-known ports and are reserved for specific services
+#define BUFFER_SIZE 1000  //number of bytes to handle the client received from the clients
 
 class Client; // forward declaration
 
@@ -57,6 +60,7 @@ class Server {
     std::map<int, Client> _clients; // map of client file descriptors to Client objects
     struct pollfd         fds[MAX_CLIENTS];
 
+    void  checkArguments(const std::string &port, const std::string &password);
     void  createSocket(int &server_fd, struct addrinfo *&server_info, const std::string &port);
     void  bindSocket(int server_fd, struct addrinfo *server_info);
     void  startListening(int server_fd);

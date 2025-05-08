@@ -33,6 +33,38 @@ Authentication: Validating server passwords and implementing user roles (e.g., a
 5. The Client class represents individual connected clients and provides methods for communication.
 6. Together, they form a server-client architecture where the Socket manages the server-side operations, and the Client handles the communication with each connected.
 
+```c++
+src/
+├── core/               # Core server logic
+│   ├── Socket.cpp
+│   ├── Server.cpp
+│   ├── Client.cpp
+│   ├── Channel.cpp
+├── commands/           # IRC commands
+│   ├── JoinCommand.cpp
+│   ├── KickCommand.cpp
+│   ├── TopicCommand.cpp
+│   ├── ...
+├── utils/              # Utility functions
+│   ├── Parser.cpp
+│   ├── Error.cpp
+├── main.cpp
+include/
+├── core/
+│   ├── Socket.hpp
+│   ├── Server.hpp
+│   ├── Client.hpp
+│   ├── Channel.hpp
+├── commands/
+│   ├── JoinCommand.hpp
+│   ├── KickCommand.hpp
+│   ├── TopicCommand.hpp
+│   ├── ...
+├── utils/
+│   ├── Parser.hpp
+│   ├── Error.hpp
+```
+
 ### Server Socket
 The server creates a socket and binds it to a specific port (e.g., 6667). It listens for incoming connections from clients.
 
