@@ -23,6 +23,7 @@ public:
     void removeOp(int clientFd); // Remove a client from operators
     void setModeL(int limit); // Set or remove user limit
     bool isOperator(int clientFd) const; // Check if a client is an operator
+    std::string applyModes(const std::vector<std::string>& modeArgs);
 
     // Client management
     void addClient(Client* client);

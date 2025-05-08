@@ -2,14 +2,14 @@
 
 CommandDispatcher::CommandDispatcher(Server* server) : _server(server) {
     // Register commands
-    registerCommand("JOIN", new JoinCommand(server));
-    registerCommand("KICK", new KickCommand(server));
-    registerCommand("INVITE", new InviteCommand(_server));
-    registerCommand("QUIT", new QuitCommand(_server));
-    registerCommand("TOPIC", new TopicCommand(_server));
-    registerCommand("WHO", new WhoCommand(_server));
-    registerCommand("PRIVMSG", new PrivmsgCommand(_server));
-    registerCommand("MODE", new ModeCommand(_server));
+    // registerCommand("JOIN", new JoinCommand(server));
+    // registerCommand("KICK", new KickCommand(server));
+    // registerCommand("INVITE", new InviteCommand(_server));
+    // registerCommand("QUIT", new QuitCommand(_server));
+    // registerCommand("TOPIC", new TopicCommand(_server));
+    // registerCommand("WHO", new WhoCommand(_server));
+    // registerCommand("PRIVMSG", new PrivmsgCommand(_server));
+    // registerCommand("MODE", new ModeCommand(_server));
 }
 
 CommandDispatcher::~CommandDispatcher() {

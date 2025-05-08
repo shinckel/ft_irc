@@ -1,7 +1,7 @@
 #pragma once
 #include "Command.hpp"
-#include "../core/Channel.hpp"
-#include "../core/Server.hpp"
+#include "core/Channel.hpp"
+#include "core/Server.hpp"
 
 class JoinCommand : public Command {
 public:

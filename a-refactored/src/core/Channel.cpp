@@ -123,8 +123,10 @@ std::string Channel::applyModes(const std::vector<std::string>& modeArgs) {
             } else if ((*it)[1] == 'o') {
                 // Add a client to operators
                 std::string nick = (it + 1 != modeArgs.end()) ? *(it + 1) : "";
-                int target = Manager::getIDbyNick(nick); // Assuming Manager::getIDbyNick is accessible
-                addClientToOp(target);
+
+                // TODO: create manager
+                // int target = Manager::getIDbyNick(nick); // Assuming Manager::getIDbyNick is accessible
+                // addClientToOp(target);
                 result += "+o " + nick + " ";
                 ++it; // Skip the nick argument
             } else if ((*it)[1] == 'l') {
@@ -150,8 +152,10 @@ std::string Channel::applyModes(const std::vector<std::string>& modeArgs) {
             } else if ((*it)[1] == 'o') {
                 // Remove a client from operators
                 std::string nick = (it + 1 != modeArgs.end()) ? *(it + 1) : "";
-                int target = Manager::getIDbyNick(nick); // Assuming Manager::getIDbyNick is accessible
-                removeOp(target);
+
+                // TODO: create manager
+                // int target = Manager::getIDbyNick(nick); // Assuming Manager::getIDbyNick is accessible
+                // removeOp(target);
                 result += "-o " + nick + " ";
                 ++it; // Skip the nick argument
             } else if ((*it)[1] == 'l') {

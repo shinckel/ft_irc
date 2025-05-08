@@ -1,55 +1,71 @@
 #include "core/Socket.hpp"
-#include <stdexcept>
-#include <cstring>
-#include <unistd.h>
+#include <iostream>
+#include <cstring> // For memset
 
-Socket::Socket() : _socketFd(-1) {
-    createSocket();
+Socket::Socket()
+{
+    // Create the socket
+    _fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (_fd == -1)
+    {
+        throw std::runtime_error("Failed to create socket");
+    }
+
+    // Allow address reuse
+    int opt = 1;
+    if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+    {
+        throw std::runtime_error("Failed to set socket options");
+    }
+
+    // Initialize the address structure
+    memset(&_addr, 0, sizeof(_addr));
+    _addr.sin_family = AF_INET;
+    _addr.sin_addr.s_addr = INADDR_ANY; // Bind to all available interfaces
 }
 
-Socket::~Socket() {
+Socket::~Socket()
+{
     close();
 }
 
-void Socket::createSocket() {
-    _socketFd = socket(AF_INET, SOCK_STREAM, 0);
-    if (_socketFd < 0) {
-        throw std::runtime_error("Failed to create socket");
-    }
-}
-
-void Socket::bind(int port) {
-    std::memset(&_address, 0, sizeof(_address));
-    _address.sin_family = AF_INET;
-    _address.sin_addr.s_addr = INADDR_ANY;
-    _address.sin_port = htons(port);
-
-    if (::bind(_socketFd, (struct sockaddr*)&_address, sizeof(_address)) < 0) {
+void Socket::bind(int port)
+{
+    _addr.sin_port = htons(port); // Convert port to network byte order
+    if (::bind(_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1)
+    {
         throw std::runtime_error("Failed to bind socket");
     }
 }
 
-void Socket::listen(int backlog) {
-    if (::listen(_socketFd, backlog) < 0) {
+void Socket::listen()
+{
+    if (::listen(_fd, SOMAXCONN) == -1)
+    {
         throw std::runtime_error("Failed to listen on socket");
     }
 }
 
-int Socket::accept() {
-    int clientFd = ::accept(_socketFd, NULL, NULL);
-    if (clientFd < 0) {
+int Socket::accept()
+{
+    int clientFd = ::accept(_fd, NULL, NULL);
+    if (clientFd == -1)
+    {
         throw std::runtime_error("Failed to accept connection");
     }
     return clientFd;
 }
 
-void Socket::close() {
-    if (_socketFd >= 0) {
-        ::close(_socketFd);
-        _socketFd = -1;
-    }
+int Socket::getFd() const
+{
+    return _fd;
 }
 
-int Socket::getSocketFd() const {
-    return _socketFd;
+void Socket::close()
+{
+    if (_fd != -1)
+    {
+        ::close(_fd);
+        _fd = -1;
+    }
 }
