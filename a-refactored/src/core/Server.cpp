@@ -73,12 +73,25 @@ void Server::handleClientData(int clientFd) {
             }
             close(clientFd);
             Manager::removeClient(clientFd);
-            updatePollfds(); // Update the pollfd array
+
+            // Remove the client from the pollfd array
+            for (size_t i = 0; i < _pollfds.size(); ++i) {
+                if (_pollfds[i].fd == clientFd) {
+                    _pollfds.erase(_pollfds.begin() + i);
+                    break;
+                }
+            }
         } else {
             buffer[bytesRead] = '\0';
-            Client &client = *Manager::getClientByID(clientFd);
-            Parser::processClientMessage(client, buffer); // Use Parser to process the message
-            Manager::runActions(client); // Execute actions based on the parsed message
+
+            // Check if the client exists
+            Client* client = Manager::getClientByID(clientFd);
+            if (client) {
+                Parser::processClientMessage(*client, buffer); // Use the client reference
+                Manager::runActions(*client); // Execute actions based on the parsed message
+            } else {
+                std::cerr << "Error: Client with FD " << clientFd << " does not exist." << std::endl;
+            }
         }
     } catch (const std::exception &e) {
         std::cerr << "Error handling client data: " << e.what() << std::endl;
@@ -97,9 +110,18 @@ void Server::updatePollfds() {
     // Add client sockets
     const std::vector<Client> &clients = Manager::getClients();
     for (size_t i = 0; i < clients.size(); ++i) {
-        struct pollfd clientPollfd;
-        clientPollfd.fd = clients[i].getId();
-        clientPollfd.events = POLLIN;
-        _pollfds.push_back(clientPollfd);
+        if (clients[i].getId() > 0) { // Ensure valid file descriptor
+            struct pollfd clientPollfd;
+            clientPollfd.fd = clients[i].getId();
+            clientPollfd.events = POLLIN;
+            _pollfds.push_back(clientPollfd);
+        }
     }
+
+    // Debugging log
+    std::cout << "Updated pollfds: ";
+    for (size_t i = 0; i < _pollfds.size(); ++i) {
+        std::cout << _pollfds[i].fd << " ";
+    }
+    std::cout << std::endl;
 }

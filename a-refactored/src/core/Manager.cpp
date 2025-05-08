@@ -27,13 +27,13 @@ std::vector<Client> &Manager::getClients() {
     return _clients;
 }
 
-std::vector<Client>::iterator Manager::getClientByID(int id) {
+Client* Manager::getClientByID(int id) {
     for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
         if (it->getId() == id) {
-            return it;
+            return &(*it);
         }
     }
-    return _clients.end();
+    return NULL;
 }
 
 std::stringstream &Manager::getClientBuffer(int id) {
@@ -51,13 +51,17 @@ std::map<std::string, Channel> &Manager::getChannels() {
 }
 
 // Actions
-void Manager::createMap() {
-    // Example: Add actions to the map
-    // _actionMap["JOIN"] = [](Client &client) { /* Join action */ };
-    // _actionMap["NICK"] = [](Client &client) { /* Nick action */ };
+// void Manager::createMap() {
+//     // Example: Add actions to the map
+//     // _actionMap["JOIN"] = [](Client &client) { /* Join action */ };
+//     // _actionMap["NICK"] = [](Client &client) { /* Nick action */ };
+// }
+void Manager::createMap(void) {
+    // _actionMap["JOIN"] = joinAction;
 }
 
 void Manager::runActions(Client &client) {
+    createMap();
     std::string cmd = client.getCommand()[0];
     std::map<std::string, eventFunction>::iterator it = _actionMap.find(cmd);
     if (it != _actionMap.end()) {

@@ -28,7 +28,7 @@ public:
     static void addClient(int id);
     static void removeClient(int id);
     static std::vector<Client> &getClients();
-    static std::vector<Client>::iterator getClientByID(int id);
+    static Client* getClientByID(int id);
     static std::stringstream &getClientBuffer(int id);
 
     // Channel management

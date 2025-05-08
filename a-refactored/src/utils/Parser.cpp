@@ -18,8 +18,8 @@ void Parser::processClientMessage(Client &client, const std::string &message) {
     // Store the parsed command and arguments in the client
     client.getBuffer().str(""); // Clear the buffer
     client.getBuffer() << message;
-    client.getCommand().clear();
-    client.getCommand().push_back(command);
+    client.getCommand().clear(); // Clear the command vector
+    client.getCommand().push_back(command); // Add the command
     client.getCommand().insert(client.getCommand().end(), args.begin(), args.end());
 
     std::cout << "Processed message from client " << client.getId() << ": " << message << std::endl;
