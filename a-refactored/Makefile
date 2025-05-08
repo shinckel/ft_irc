@@ -19,19 +19,9 @@ SRCS =	src/main.cpp \
         src/core/Client.cpp \
         src/core/Channel.cpp \
 				src/core/Manager.cpp \
-				src/commands/CapCommand.cpp \
-				src/commands/CommandDispatcher.cpp \
-				src/commands/InviteCommand.cpp \
-        src/commands/JoinCommand.cpp \
-        src/commands/KickCommand.cpp \
-        src/commands/TopicCommand.cpp \
-        src/commands/NickCommand.cpp \
-        src/commands/UserCommand.cpp \
-        src/commands/ModeCommand.cpp \
-				src/commands/PassCommand.cpp \
-				src/commands/PrivmsgCommand.cpp \
-				src/commands/QuitCommand.cpp \
-				src/commands/WhoCommand.cpp \
+				src/commands/Authentication.cpp \
+				src/commands/Information.cpp \
+				src/commands/Management.cpp \
         src/utils/Parser.cpp \
         src/utils/Error.cpp
 

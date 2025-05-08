@@ -2,6 +2,24 @@
 #include "utils/Error.hpp"
 #include <stdexcept>
 
+#include "core/Server.hpp"
+#include <iostream>
+
+Server::Server(const std::string& port, const std::string& password)
+    : _socket(port, password), _password(password) {}
+
+void Server::start() {
+    std::cout << "Server started on port " << _socket.getPort() << std::endl;
+
+    while (true) {
+        try {
+            handleNewConnection();
+        } catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+        }
+    }
+}
+
 void Server::handleNewConnection() {
     try {
         int clientFd = _socket.acceptConnection();

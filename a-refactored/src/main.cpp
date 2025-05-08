@@ -1,4 +1,4 @@
-#include "core/Socket.hpp"
+#include "core/Server.hpp"
 
 void printUsage() {
     std::cout << "Usage: ./ircserv <port> <password>" << std::endl;
@@ -14,8 +14,9 @@ int main(int argc, char **argv) {
     }
 
     try {
-        // Initialize the server socket
-        Socket socketServer(argv[1], argv[2]);
+        // Initialize and start the server
+        Server server(argv[1], argv[2]);
+        server.start();
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;

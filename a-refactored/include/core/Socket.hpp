@@ -30,6 +30,7 @@ public:
     ~Socket();
 
     int getSocketFd() const;
+    const std::string& getPort() const;
     const std::string& getPassword() const; // Add a getter for the password
     int acceptConnection() const;
 };

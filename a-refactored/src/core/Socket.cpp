@@ -79,6 +79,10 @@ int Socket::getSocketFd() const {
     return _socketFd;
 }
 
+const std::string& Socket::getPort() const {
+    return _port;
+}
+
 const std::string& Socket::getPassword() const {
     return _password;
 }
