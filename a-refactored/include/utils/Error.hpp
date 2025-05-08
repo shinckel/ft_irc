@@ -1,10 +1,17 @@
-#pragma once
+#ifndef ERROR_HPP
+#define ERROR_HPP
+
 #include <string>
 #include <map>
+#include <iostream>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <cstring>
 
 class Error {
 public:
     static std::string getErrorMessage(int errorCode);
+    static void printServerInfo(struct addrinfo* serverInfo);
 
     // Error codes
     static const int ERR_NEEDMOREPARAMS;
@@ -22,3 +29,5 @@ private:
     static std::map<int, std::string> initializeErrorMessages();
     static const std::map<int, std::string> errorMessages;
 };
+
+#endif

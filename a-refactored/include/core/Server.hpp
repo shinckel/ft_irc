@@ -1,10 +1,14 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include <string>
+#include <iostream>
+#include <stdexcept>
+
 #include "Socket.hpp"
 #include "Manager.hpp"
 #include "utils/Parser.hpp"
-#include <string>
+#include "utils/Error.hpp"
 
 class Server {
 private:

@@ -24,6 +24,7 @@ public:
     static std::string hostName;
 
     // Client management
+    static void setPassword(std::string password);
     static void addClient(int id);
     static void removeClient(int id);
     static std::vector<Client> &getClients();

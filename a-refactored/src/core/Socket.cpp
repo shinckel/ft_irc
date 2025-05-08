@@ -1,17 +1,13 @@
 #include "core/Socket.hpp"
-#include <cstring>
-#include <cstdlib> // For atoi
-#include <stdexcept>
 
 Socket::Socket(const std::string& port, const std::string& password) : _port(port), _password(password) {
-    if (_password.empty()) {
-        throw std::runtime_error("Password cannot be empty.");
-    }
-
     try {
-        parsePort(port);
+        parsePortPass(port, password);
+        Manager::setPassword(password);
 
         struct addrinfo* serverInfo = setupSocketAddress();
+        Error::printServerInfo(serverInfo); // debugging
+
         bindAndListen(serverInfo);
         freeaddrinfo(serverInfo);
 
@@ -27,10 +23,14 @@ Socket::~Socket() {
     std::cout << "Socket closed" << std::endl;
 }
 
-void Socket::parsePort(const std::string& port) {
+void Socket::parsePortPass(const std::string& port, const std::string& password) {
     int portNum = atoi(port.c_str());
-    if (port.empty() || portNum <= MIN_PORT || portNum > MAX_PORT) {
+    if (port.length() <= 0 || portNum <= MIN_PORT || portNum > MAX_PORT) {
         throw std::runtime_error("Invalid port number. Must be between 1024 and 65535.");
+    }
+
+    if (password.length() == 0 || password.find_first_not_of(" \t\n\r") == std::string::npos) {
+        throw std::runtime_error("Invalid password: Password cannot be empty or whitespace only");
     }
 }
 

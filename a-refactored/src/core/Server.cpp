@@ -1,12 +1,9 @@
 #include "core/Server.hpp"
-#include "utils/Error.hpp"
-#include <stdexcept>
-
-#include "core/Server.hpp"
-#include <iostream>
 
 Server::Server(const std::string& port, const std::string& password)
-    : _socket(port, password), _password(password) {}
+    : _socket(port, password), _password(password) {
+        start();
+    }
 
 void Server::start() {
     std::cout << "Server started on port " << _socket.getPort() << std::endl;

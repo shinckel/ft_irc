@@ -22,6 +22,7 @@ SRCS =	src/main.cpp \
 				src/commands/Authentication.cpp \
 				src/commands/Information.cpp \
 				src/commands/Management.cpp \
+				src/utils/Debug.cpp \
         src/utils/Parser.cpp \
         src/utils/Error.cpp
 

@@ -80,3 +80,7 @@ int Manager::sendIrcMessage(int clientId, const std::string &message) {
     std::cout << "Sending message to client " << clientId << ": " << message << std::endl;
     return 0; // Simulate sending a message
 }
+
+void Manager::setPassword(std::string pass) {
+	_password = pass;
+}
