@@ -18,7 +18,7 @@ private:
     static std::string _password;
     static std::vector<Client> _clients;
     static std::map<std::string, Channel> _channels;
-    static std::map<std::string, eventFunction> _actionMap;
+    static std::map<std::string, void (*)(Client&)> _actionMap;
 
 public:
     static std::string hostName;
@@ -35,12 +35,12 @@ public:
     static std::map<std::string, Channel> &getChannels();
 
     // Actions
-    static void createMap(Client &client);
+    static void createMap();
     static void runActions(Client &client);
 
     // Commands
-    void joinAction(Client &client);
-    void sendNamesList(const std::string &channelName, Client &client);
+    static void joinAction(Client &client);
+    static void sendNamesList(const std::string &channelName, Client &client);
 
     // Utilities
     static std::string formatMessage(Client &client);

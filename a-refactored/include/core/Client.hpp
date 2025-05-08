@@ -14,7 +14,8 @@ private:
     std::string _lastTriedNick;
     std::string _hostname;
     std::stringstream _buffer;
-    std::vector<std::string> _cmd;
+    std::vector<std::string> _commands; // Stores the commands
+    // std::vector<std::string> _cmd;
 
 public:
     Client(int id);
@@ -30,7 +31,7 @@ public:
     std::string &getChannel();
     std::string getClientPrefix() const;
     std::stringstream &getBuffer();
-    std::vector<std::string> getCommand() const;
+    std::vector<std::string> &getCommand();
 
     // Setters
     void setNickName(const std::string &nickName);

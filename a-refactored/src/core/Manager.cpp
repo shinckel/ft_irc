@@ -56,8 +56,22 @@ std::map<std::string, Channel> &Manager::getChannels() {
 //     // _actionMap["JOIN"] = [](Client &client) { /* Join action */ };
 //     // _actionMap["NICK"] = [](Client &client) { /* Nick action */ };
 // }
-void Manager::createMap(Client &client) {
-    _actionMap["JOIN"] = Manager::joinAction(client);
+void Manager::createMap() {
+    // Populate the action map with command-function pairs
+    _actionMap["JOIN"] = &Manager::joinAction;
+    // _actionMap["NICK"] = &Manager::nickAction;
+    // _actionMap["INVITE"] = &Manager::inviteAction;
+    // _actionMap["KICK"] = &Manager::kickAction;
+    // _actionMap["TOPIC"] = &Manager::topicAction;
+    // _actionMap["MODE"] = &Manager::modeAction;
+    // _actionMap["PRIVMSG"] = &Manager::privmsgAction;
+    // _actionMap["WHO"] = &Manager::whoAction;
+    // _actionMap["USER"] = &Manager::userAction;
+    // _actionMap["PASS"] = &Manager::passAction;
+    // _actionMap["CAP"] = &Manager::capAction;
+    // _actionMap["QUIT"] = &Manager::quitAction;
+
+    std::cout << "Action map created with " << _actionMap.size() << " commands." << std::endl;
 }
 
 void Manager::runActions(Client &client) {
@@ -70,7 +84,6 @@ void Manager::runActions(Client &client) {
     }
 
     std::string cmd = commands[0];
-    createMap(client);
     std::map<std::string, eventFunction>::iterator it = _actionMap.find(cmd);
 
     if (it != _actionMap.end()) {

@@ -4,20 +4,24 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
+#include <iostream>
 
 #include "core/Client.hpp"
 #include "utils/Error.hpp"
 
 class Channel {
 private:
-    std::string _name;
-    std::string _topic;
-    std::vector<Client *> _clients;
-    std::map<std::string, Client *> _operators;
+    std::string _name;                          // Channel name
+    std::string _topic;                         // Channel topic
+    std::vector<Client *> _clients;             // List of clients in the channel
+    std::map<std::string, Client *> _operators; // Map of operator nicknames to Client pointers
 
 public:
+    // Constructor and Destructor
+    Channel() : _name(""), _topic("") {}
     Channel(const std::string &name);
-    ~Channel();
+    ~Channel() {}
 
     // Getters
     const std::string &getName() const;
@@ -39,6 +43,7 @@ public:
 
     // Error handling
     std::string getErrorMessage(int errorCode) const;
+    std::vector<std::string> getNamesList() const;
 };
 
 #endif

@@ -1,44 +1,47 @@
 #include "core/Manager.hpp"
 
 void Manager::joinAction(Client &client) {
-  std::vector<std::string> command = client.getCommand();
-  if (!Parser::joinParse(client) || command.size() < 2) return;
+  const std::vector<std::string> &command = client.getCommand();
+
+  // Check if the command has enough parameters
+  if (command.size() < 2) {
+      sendIrcMessage(client.getId(), formatMessage(client, "461") + " JOIN :Not enough parameters");
+      return;
+  }
 
   std::string channelName = command[1];
-  size_t spacePos = channelName.find(" ");
-  if (spacePos != std::string::npos)
-      channelName = channelName.substr(0, spacePos);
 
-  Channel &channel = _channels[channelName];
-  if (!_channels.count(channelName))
-      _channels[channelName] = Channel(channelName);
+  // Check if the channel exists; if not, create it
+  Channel &channel = (_channels.find(channelName) == _channels.end())
+                         ? _channels.insert(std::make_pair(channelName, Channel(channelName))).first->second
+                         : _channels[channelName];
 
-  // Se canal for invite-only e cliente não foi convidado
-  // if (channel.getModeI() && !channel.isInvited(client.getId())) {
-  //     sendIrcMessage(client.getId(), formatMessage(client, ERR_INVITEONLYCHAN) + " " + channelName + " :Cannot join channel (+i)");
-  //     return;
-  // }
-
+  // Add the client to the channel
   channel.addClient(&client);
-  sendIrcMessage(&client, formatMessage(client) + " JOIN :" + channelName);
 
-  // if (!channel.getTopic().empty()) {
-  //     sendIrcMessage(&client, formatMessage(client, TOPIC_CHANNEL) + " " + channelName + " :" + channel.getTopic());
-  // }
+  // Send confirmation to the client
+  sendIrcMessage(client.getId(), formatMessage(client) + " JOIN :" + channelName);
 
+  // Send the list of users in the channel
   sendNamesList(channelName, client);
 }
 
 void Manager::sendNamesList(const std::string &channelName, Client &client) {
-  std::string _serverName = "my_server";
-  std::vector<std::string> namesList = _channels[channelName].getNamesList();
-  std::string namesMessage = Manager::formatMessage(client, "353") + " = " + channelName + " :";
-  for (unsigned long i = 0; i < namesList.size(); i++) {
-      namesMessage += namesList[i];
-      if (i != namesList.size() - 1)
-          namesMessage += " ";
+  if (_channels.find(channelName) == _channels.end()) {
+      return;
   }
-  sendIrcMessage(&client, namesMessage);
-  // Send end of NAMES list
-  sendIrcMessage(&client, formatMessage(client, "366") + " " + channelName + " :End of /NAMES list");
+
+  Channel &channel = _channels[channelName];
+  std::vector<std::string> namesList = channel.getNamesList();
+
+  std::string namesMessage = formatMessage(client, "353") + " = " + channelName + " :";
+  for (size_t i = 0; i < namesList.size(); ++i) {
+      namesMessage += namesList[i];
+      if (i != namesList.size() - 1) {
+          namesMessage += " ";
+      }
+  }
+
+  sendIrcMessage(client.getId(), namesMessage);
+  sendIrcMessage(client.getId(), formatMessage(client, "366") + " " + channelName + " :End of /NAMES list");
 }

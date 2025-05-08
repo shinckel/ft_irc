@@ -1,24 +1,15 @@
 #include "../includes/Channel.hpp"
 
-Channel::Channel(std::string id){
-    _channelId = id;
-    _key = "";
-    _topic = "";
-    _ModeI = 0;
-    _ModeT = 0;
-    _limit = 0;
-    std::cout << "Channel created with id: " << id << std::endl;
-    Manager::addChannelName(id);
-}
-
-// Channel::Channel(const Channel &src) {
-//     // std::cout << "aqui 1" << std::endl;
-//     _channelId = src._channelId;
-//     _key = src._key;
-//     _topic = src._topic;
-//     _ModeI = src._ModeI;
-//     _ModeT = src._ModeT;
-//     _limit = src._limit;
+Channel::Channel(const std::string &name) : _name(name) {}
+// Channel::Channel(std::string id){
+//     _channelId = id;
+//     _key = "";
+//     _topic = "";
+//     _ModeI = 0;
+//     _ModeT = 0;
+//     _limit = 0;
+//     std::cout << "Channel created with id: " << id << std::endl;
+//     Manager::addChannelName(id);
 // }
 
 Channel &Channel::operator=(const Channel &src) {

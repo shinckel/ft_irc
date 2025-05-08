@@ -14,6 +14,8 @@ int main(int argc, char **argv) {
     }
 
     try {
+        Manager::createMap();
+
         // Initialize and start the server
         Server server(argv[1], argv[2]);
         server.start();

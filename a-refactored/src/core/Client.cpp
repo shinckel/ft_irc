@@ -18,7 +18,7 @@ Client &Client::operator=(const Client &src) {
         _userName = src._userName;
         _channel = src._channel;
         _lastTriedNick = src._lastTriedNick;
-        _cmd = src._cmd;
+        _commands = src._commands;
     }
     return *this;
 }
@@ -52,8 +52,8 @@ std::stringstream &Client::getBuffer() {
     return _buffer;
 }
 
-std::vector<std::string> Client::getCommand() const {
-    return _cmd;
+std::vector<std::string> &Client::getCommand() {
+    return _commands;
 }
 
 // Setters
