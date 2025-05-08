@@ -11,6 +11,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>
+#include <cerrno>
+#include <fcntl.h>
 
 #include "Manager.hpp"
 #include "utils/Error.hpp"

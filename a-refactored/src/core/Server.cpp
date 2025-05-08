@@ -53,8 +53,15 @@ void Server::handleNewConnection() {
         // Add the new client to the pollfd array
         struct pollfd clientPollfd;
         clientPollfd.fd = clientFd;
-        clientPollfd.events = POLLIN; // Monitor for incoming data
+        clientPollfd.events = POLLIN;
         _pollfds.push_back(clientPollfd);
+
+        // Send a welcome message
+        std::stringstream ss;
+        ss << clientFd;
+        std::string welcomeMessage = ":localhost 001 " + ss.str() + " :Welcome to the IRC server!";
+        send(clientFd, welcomeMessage.c_str(), welcomeMessage.size(), 0);
+        std::cout << "Sent welcome message to client " << clientFd << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Error accepting new connection: " << e.what() << std::endl;
     }
@@ -68,8 +75,11 @@ void Server::handleClientData(int clientFd) {
         if (bytesRead <= 0) {
             if (bytesRead == 0) {
                 std::cout << "Client disconnected: " << clientFd << std::endl;
+            } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                std::cerr << "No data available to read from client " << clientFd << " (EAGAIN/EWOULDBLOCK)." << std::endl;
+                return;
             } else {
-                std::cerr << "Error reading from client: " << clientFd << std::endl;
+                std::cerr << "Error reading from client " << clientFd << ": " << strerror(errno) << std::endl;
             }
             close(clientFd);
             Manager::removeClient(clientFd);
@@ -83,12 +93,13 @@ void Server::handleClientData(int clientFd) {
             }
         } else {
             buffer[bytesRead] = '\0';
+            std::cout << "Received data from client " << clientFd << ": " << buffer << std::endl;
 
             // Check if the client exists
             Client* client = Manager::getClientByID(clientFd);
             if (client) {
-                Parser::processClientMessage(*client, buffer); // Use the client reference
-                Manager::runActions(*client); // Execute actions based on the parsed message
+                Parser::processClientMessage(*client, buffer);
+                Manager::runActions(*client);
             } else {
                 std::cerr << "Error: Client with FD " << clientFd << " does not exist." << std::endl;
             }

@@ -93,7 +93,14 @@ int Socket::acceptConnection() const {
     int clientFd = accept(_socketFd, (struct sockaddr*)&clientAddr, &addrLen);
 
     if (clientFd < 0) {
-        throw std::runtime_error("Failed to accept connection.");
+        throw std::runtime_error("Failed to accept connection: " + std::string(strerror(errno)));
+    }
+
+    // Set the client socket to non-blocking mode
+    int flags = fcntl(clientFd, F_GETFL, 0);
+    if (flags == -1 || fcntl(clientFd, F_SETFL, flags | O_NONBLOCK) == -1) {
+        close(clientFd);
+        throw std::runtime_error("Failed to set client socket to non-blocking mode.");
     }
 
     return clientFd;
