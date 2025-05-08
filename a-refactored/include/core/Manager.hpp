@@ -35,8 +35,12 @@ public:
     static std::map<std::string, Channel> &getChannels();
 
     // Actions
-    static void createMap();
+    static void createMap(Client &client);
     static void runActions(Client &client);
+
+    // Commands
+    void joinAction(Client &client);
+    void sendNamesList(const std::string &channelName, Client &client);
 
     // Utilities
     static std::string formatMessage(Client &client);

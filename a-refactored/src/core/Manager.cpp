@@ -56,14 +56,23 @@ std::map<std::string, Channel> &Manager::getChannels() {
 //     // _actionMap["JOIN"] = [](Client &client) { /* Join action */ };
 //     // _actionMap["NICK"] = [](Client &client) { /* Nick action */ };
 // }
-void Manager::createMap(void) {
-    // _actionMap["JOIN"] = joinAction;
+void Manager::createMap(Client &client) {
+    _actionMap["JOIN"] = Manager::joinAction(client);
 }
 
 void Manager::runActions(Client &client) {
-    createMap();
-    std::string cmd = client.getCommand()[0];
+    const std::vector<std::string> &commands = client.getCommand();
+
+    // Check if the command vector is empty
+    if (commands.empty()) {
+        std::cerr << "Error: No command found for client " << client.getId() << std::endl;
+        return;
+    }
+
+    std::string cmd = commands[0];
+    createMap(client);
     std::map<std::string, eventFunction>::iterator it = _actionMap.find(cmd);
+
     if (it != _actionMap.end()) {
         it->second(client);
     } else {

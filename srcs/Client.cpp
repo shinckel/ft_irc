@@ -84,22 +84,22 @@ void Client::setLastTriedNickname(const std::string &lastNickname) {
 }
 
 void Client::setCommand(const std::string &command) {
-    _commands.clear();
+    _cmd.clear();
     std::string cmd = command;
 
     if (!cmd.empty() && cmd[0] == '/') {
-        cmd.erase(0, 1); // remove leading '/'
+        cmd.erase(0, 1); // Remove leading '/'
     }
 
     size_t spacePos = cmd.find(' ');
     if (spacePos != std::string::npos) {
         std::string commandName = cmd.substr(0, spacePos);
-        std::transform(commandName.begin(), commandName.end(), commandName.begin(), ::toupper); // convert to uppercase
-        _commands.push_back(commandName);
-        _commands.push_back(cmd.substr(spacePos + 1));
+        std::transform(commandName.begin(), commandName.end(), commandName.begin(), ::toupper); // Convert to uppercase
+        _cmd.push_back(commandName);
+        _cmd.push_back(cmd.substr(spacePos + 1));
     } else {
-        std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // convert to uppercase
-        _commands.push_back(cmd);
+        std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper); // Convert to uppercase
+        _cmd.push_back(cmd);
     }
 }
 
