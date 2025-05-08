@@ -53,8 +53,8 @@ std::map<std::string, Channel> &Manager::getChannels() {
 // Actions
 void Manager::createMap() {
     // Example: Add actions to the map
-    _actionMap["JOIN"] = [](Client &client) { /* Join action */ };
-    _actionMap["NICK"] = [](Client &client) { /* Nick action */ };
+    // _actionMap["JOIN"] = [](Client &client) { /* Join action */ };
+    // _actionMap["NICK"] = [](Client &client) { /* Nick action */ };
 }
 
 void Manager::runActions(Client &client) {
