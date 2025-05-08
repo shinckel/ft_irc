@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstring>
 #include <unistd.h>
+#include <cerrno>
 
 Server::Server(const std::string& port, const std::string& password)
     : _socket(port, password), _password(password) {}
