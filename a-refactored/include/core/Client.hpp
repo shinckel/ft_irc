@@ -1,23 +1,43 @@
-#pragma once
+#ifndef CLIENT_HPP
+#define CLIENT_HPP
+
 #include <string>
+#include <sstream>
 #include <vector>
 
 class Client {
-public:
-    explicit Client(int fd);
-    ~Client();
-
-    int getFd() const;
-    std::string receiveMessage();
-    void sendMessage(const std::string& message);
-
-    // Methods for handling raw commands
-    void setRawCommand(const std::string& rawCommand);
-    const std::string& getRawCommand() const;
-    const std::vector<std::string>& getCommandTokens() const;
-
 private:
-    int _fd;
-    std::string _rawCommand; // Stores the raw command string
-    std::vector<std::string> _commandTokens; // Stores the split tokens of the command
+    int _clientID;
+    std::string _nickName;
+    std::string _userName;
+    std::string _channel;
+    std::string _lastTriedNick;
+    std::string _hostname;
+    std::stringstream _buffer;
+    std::vector<std::string> _cmd;
+
+public:
+    Client(int id);
+    ~Client();
+    Client(const Client &src);
+    Client &operator=(const Client &src);
+
+    // Getters
+    int getId() const;
+    std::string &getNickName();
+    std::string &getLastNick();
+    std::string &getUserName();
+    std::string &getChannel();
+    std::string getClientPrefix() const;
+    std::stringstream &getBuffer();
+    std::vector<std::string> getCommand() const;
+
+    // Setters
+    void setNickName(const std::string &nickName);
+    void setLastNick(const std::string &lastNick);
+    void setUserName(const std::string &userName);
+    void setChannel(const std::string &channel);
+    void setHostName(const std::string &hostname);
 };
+
+#endif

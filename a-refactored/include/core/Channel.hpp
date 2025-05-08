@@ -1,51 +1,44 @@
-#pragma once
-#include "Client.hpp"
+#ifndef CHANNEL_HPP
+#define CHANNEL_HPP
+
 #include <string>
 #include <vector>
+#include <map>
+
+#include "core/Client.hpp"
+#include "utils/Error.hpp"
 
 class Channel {
+private:
+    std::string _name;
+    std::string _topic;
+    std::vector<Client *> _clients;
+    std::map<std::string, Client *> _operators;
+
 public:
-    // Constructor
-    explicit Channel(const std::string& name);
+    Channel(const std::string &name);
+    ~Channel();
 
     // Getters
-    const std::string& getName() const;
-    const std::string& getKey() const;
-    const std::string& getModes() const;
-    const std::vector<Client*>& getClients() const;
-    std::vector<int> getClientIDs() const; // Get the list of client IDs in the channel
+    const std::string &getName() const;
+    const std::string &getTopic() const;
+    const std::vector<Client *> &getClients() const;
 
-    // Mode-related functions
-    void setModeI(bool enabled); // Invite-only mode
-    void setModeT(bool enabled); // Topic restriction mode
-    void setKey(const std::string& key); // Set or remove channel key
-    void addClientToOp(int clientFd); // Add a client to operators
-    void removeOp(int clientFd); // Remove a client from operators
-    void setModeL(int limit); // Set or remove user limit
-    bool isOperator(int clientFd) const; // Check if a client is an operator
-    std::string applyModes(const std::vector<std::string>& modeArgs);
+    // Setters
+    void setTopic(const std::string &topic);
 
     // Client management
-    void addClient(Client* client);
-    void removeClient(Client* client);
-    bool checkClient(int clientFd) const;
+    void addClient(Client *client);
+    void removeClient(Client *client);
+    bool isClientInChannel(Client *client) const;
 
-    // Topic-related functions
-    const std::string& getTopic() const;
-    void setTopic(const std::string& topic);
+    // Operator management
+    void addOperator(Client *client);
+    void removeOperator(Client *client);
+    bool isOperator(Client *client) const;
 
-    // Messaging
-    void clientMessage(int senderFd, const std::string& message) const;
-    void channelMessage(const std::string& message) const;
-
-private:
-    std::string _name; // Channel name
-    std::string _key; // Channel key
-    std::string _topic; // Channel topic
-    std::string _modes; // Current modes as a string
-    bool _modeI; // Invite-only mode
-    bool _modeT; // Topic restriction mode
-    int _limit; // User limit
-    std::vector<int> _operators; // List of operator client FDs
-    std::vector<Client*> _clients; // List of clients in the channel
+    // Error handling
+    std::string getErrorMessage(int errorCode) const;
 };
+
+#endif

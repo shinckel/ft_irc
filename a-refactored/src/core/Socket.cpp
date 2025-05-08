@@ -1,71 +1,96 @@
 #include "core/Socket.hpp"
-#include <iostream>
-#include <cstring> // For memset
+#include <cstring>
+#include <cstdlib> // For atoi
+#include <stdexcept>
 
-Socket::Socket()
-{
-    // Create the socket
-    _fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (_fd == -1)
-    {
-        throw std::runtime_error("Failed to create socket");
+Socket::Socket(const std::string& port, const std::string& password) : _port(port), _password(password) {
+    if (_password.empty()) {
+        throw std::runtime_error("Password cannot be empty.");
     }
 
-    // Allow address reuse
-    int opt = 1;
-    if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
-    {
-        throw std::runtime_error("Failed to set socket options");
-    }
+    try {
+        parsePort(port);
 
-    // Initialize the address structure
-    memset(&_addr, 0, sizeof(_addr));
-    _addr.sin_family = AF_INET;
-    _addr.sin_addr.s_addr = INADDR_ANY; // Bind to all available interfaces
-}
+        struct addrinfo* serverInfo = setupSocketAddress();
+        bindAndListen(serverInfo);
+        freeaddrinfo(serverInfo);
 
-Socket::~Socket()
-{
-    close();
-}
-
-void Socket::bind(int port)
-{
-    _addr.sin_port = htons(port); // Convert port to network byte order
-    if (::bind(_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1)
-    {
-        throw std::runtime_error("Failed to bind socket");
+        std::cout << "Socket initialized on port " << _port << " with password: " << _password << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Socket initialization error: " << e.what() << std::endl;
+        throw;
     }
 }
 
-void Socket::listen()
-{
-    if (::listen(_fd, SOMAXCONN) == -1)
-    {
-        throw std::runtime_error("Failed to listen on socket");
+Socket::~Socket() {
+    close(_socketFd);
+    std::cout << "Socket closed" << std::endl;
+}
+
+void Socket::parsePort(const std::string& port) {
+    int portNum = atoi(port.c_str());
+    if (port.empty() || portNum <= MIN_PORT || portNum > MAX_PORT) {
+        throw std::runtime_error("Invalid port number. Must be between 1024 and 65535.");
     }
 }
 
-int Socket::accept()
-{
-    int clientFd = ::accept(_fd, NULL, NULL);
-    if (clientFd == -1)
-    {
-        throw std::runtime_error("Failed to accept connection");
+struct addrinfo* Socket::setupSocketAddress() {
+    struct addrinfo hints, *serverInfo;
+    std::memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    if (getaddrinfo(NULL, _port.c_str(), &hints, &serverInfo) != 0) {
+        throw std::runtime_error("Failed to get address info.");
     }
+    return serverInfo;
+}
+
+void Socket::bindAndListen(struct addrinfo* serverInfo) {
+    struct addrinfo* p;
+    int yes = 1;
+
+    for (p = serverInfo; p != NULL; p = p->ai_next) {
+        _socketFd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        if (_socketFd < 0) {
+            continue;
+        }
+
+        setsockopt(_socketFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+
+        if (bind(_socketFd, p->ai_addr, p->ai_addrlen) == 0) {
+            break;
+        }
+
+        close(_socketFd);
+    }
+
+    if (p == NULL) {
+        throw std::runtime_error("Failed to bind socket.");
+    }
+
+    if (listen(_socketFd, BACKLOG) < 0) {
+        throw std::runtime_error("Failed to listen on socket.");
+    }
+}
+
+int Socket::getSocketFd() const {
+    return _socketFd;
+}
+
+const std::string& Socket::getPassword() const {
+    return _password;
+}
+
+int Socket::acceptConnection() const {
+    struct sockaddr_storage clientAddr;
+    socklen_t addrLen = sizeof(clientAddr);
+    int clientFd = accept(_socketFd, (struct sockaddr*)&clientAddr, &addrLen);
+
+    if (clientFd < 0) {
+        throw std::runtime_error("Failed to accept connection.");
+    }
+
     return clientFd;
-}
-
-int Socket::getFd() const
-{
-    return _fd;
-}
-
-void Socket::close()
-{
-    if (_fd != -1)
-    {
-        ::close(_fd);
-        _fd = -1;
-    }
 }

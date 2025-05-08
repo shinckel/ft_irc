@@ -1,12 +1,12 @@
-#pragma once
+#ifndef PARSER_HPP
+#define PARSER_HPP
+
 #include <string>
-#include <vector>
+#include "core/Client.hpp"
 
 class Parser {
 public:
-    // Splitting tokens
-    static std::vector<std::string> split(const std::string& str, char delimiter);
-
-    // Command validation
-    static bool validateCommand(const std::vector<std::string>& tokens, const std::string& commandName, int minArgs);
+    static void processClientMessage(Client &client, const std::string &message);
 };
+
+#endif

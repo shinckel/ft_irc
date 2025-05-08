@@ -1,24 +1,26 @@
 #include "utils/Parser.hpp"
+#include <iostream>
 #include <sstream>
+#include <vector>
 
-std::vector<std::string> Parser::split(const std::string& str, char delimiter) {
-    std::vector<std::string> tokens;
-    std::stringstream ss(str);
-    std::string token;
+void Parser::processClientMessage(Client &client, const std::string &message) {
+    std::istringstream stream(message);
+    std::string command;
+    std::vector<std::string> args;
 
-    while (std::getline(ss, token, delimiter)) {
-        tokens.push_back(token);
+    // Parse the command and arguments
+    stream >> command;
+    std::string arg;
+    while (stream >> arg) {
+        args.push_back(arg);
     }
 
-    return tokens;
-}
+    // Store the parsed command and arguments in the client
+    client.getBuffer().str(""); // Clear the buffer
+    client.getBuffer() << message;
+    client.getCommand().clear();
+    client.getCommand().push_back(command);
+    client.getCommand().insert(client.getCommand().end(), args.begin(), args.end());
 
-bool Parser::validateCommand(const std::vector<std::string>& tokens, const std::string& commandName, int minArgs) {
-    if (tokens.empty() || tokens[0] != commandName) {
-        return false; // Command name does not match
-    }
-    if ((int)tokens.size() - 1 < minArgs) {
-        return false; // Not enough arguments
-    }
-    return true;
+    std::cout << "Processed message from client " << client.getId() << ": " << message << std::endl;
 }

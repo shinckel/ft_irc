@@ -1,5 +1,6 @@
 #ifndef MANAGER_HPP
 #define MANAGER_HPP
+
 #include "Socket.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"

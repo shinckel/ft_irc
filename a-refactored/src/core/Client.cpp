@@ -1,47 +1,78 @@
 #include "core/Client.hpp"
-#include "utils/Parser.hpp"
-#include <unistd.h>
-#include <stdexcept>
-#include <cstring>
 #include <iostream>
 
-Client::Client(int fd) : _fd(fd) {}
+Client::Client(int id) : _clientID(id), _nickName(""), _userName(""), _channel(""), _lastTriedNick("") {
+    std::cout << "Client created with id: " << id << std::endl;
+}
 
-Client::~Client() {
-    if (_fd >= 0) {
-        close(_fd);
+Client::~Client() {}
+
+Client::Client(const Client &src) {
+    *this = src;
+}
+
+Client &Client::operator=(const Client &src) {
+    if (this != &src) {
+        _clientID = src._clientID;
+        _nickName = src._nickName;
+        _userName = src._userName;
+        _channel = src._channel;
+        _lastTriedNick = src._lastTriedNick;
+        _cmd = src._cmd;
     }
+    return *this;
 }
 
-int Client::getFd() const {
-    return _fd;
+// Getters
+int Client::getId() const {
+    return _clientID;
 }
 
-std::string Client::receiveMessage() {
-    char buffer[1024];
-    std::memset(buffer, 0, sizeof(buffer));
-    ssize_t bytesRead = read(_fd, buffer, sizeof(buffer) - 1);
-    if (bytesRead <= 0) {
-        return "";
-    }
-    return std::string(buffer);
+std::string &Client::getNickName() {
+    return _nickName;
 }
 
-void Client::sendMessage(const std::string& message) {
-    if (write(_fd, message.c_str(), message.size()) < 0) {
-        throw std::runtime_error("Failed to send message");
-    }
+std::string &Client::getLastNick() {
+    return _lastTriedNick;
 }
 
-void Client::setRawCommand(const std::string& rawCommand) {
-    _rawCommand = rawCommand;
-    _commandTokens = Parser::split(rawCommand, ' '); // Use the Parser to split tokens
+std::string &Client::getUserName() {
+    return _userName;
 }
 
-const std::string& Client::getRawCommand() const {
-    return _rawCommand;
+std::string &Client::getChannel() {
+    return _channel;
 }
 
-const std::vector<std::string>& Client::getCommandTokens() const {
-    return _commandTokens;
+std::string Client::getClientPrefix() const {
+    return _nickName + "!" + _userName + "@" + _hostname;
+}
+
+std::stringstream &Client::getBuffer() {
+    return _buffer;
+}
+
+std::vector<std::string> Client::getCommand() const {
+    return _cmd;
+}
+
+// Setters
+void Client::setNickName(const std::string &nickName) {
+    _nickName = nickName;
+}
+
+void Client::setLastNick(const std::string &lastNick) {
+    _lastTriedNick = lastNick;
+}
+
+void Client::setUserName(const std::string &userName) {
+    _userName = userName;
+}
+
+void Client::setChannel(const std::string &channel) {
+    _channel = channel;
+}
+
+void Client::setHostName(const std::string &hostname) {
+    _hostname = hostname;
 }

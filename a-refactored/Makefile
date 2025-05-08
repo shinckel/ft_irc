@@ -18,6 +18,7 @@ SRCS =	src/main.cpp \
 				src/core/Server.cpp \
         src/core/Client.cpp \
         src/core/Channel.cpp \
+				src/core/Manager.cpp \
 				src/commands/CapCommand.cpp \
 				src/commands/CommandDispatcher.cpp \
 				src/commands/InviteCommand.cpp \
