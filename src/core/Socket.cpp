@@ -11,9 +11,18 @@
 // step 8: handle client actions
 // step 9: close server socket after exiting the loop
 
+Server *Server::instance = NULL;
+
 // constructor: initializes the socket with the given port and password
 Server::Server(std::string port, std::string password) : _port(port) {
     std::cout << "Socket Constructor called" << std::endl;
+
+    instance = this;
+    // Register the signal handler
+    signal(SIGINT, Server::signalHandler);
+    signal(SIGQUIT, Server::signalHandler);
+    signal(SIGPIPE, SIG_IGN);
+
     Manager::setPassword(password); // set the server password
     parsePortPass(port, password);  // validate port and password
     initSocket();                   // initialize the server socket
@@ -22,32 +31,20 @@ Server::Server(std::string port, std::string password) : _port(port) {
 
 Server::~Server() {
     std::cout << "Socket destroyed" << std::endl;
+    cleanup(); // clean up resources
 }
 
 void Server::parsePortPass(std::string port, std::string password) {
-    // Verifique se o valor do `port` é válido antes de usá-lo
     if (port.empty()) {
         std::cerr << "Port is not valid" << std::endl;
-        exit(1); // ou outro erro apropriado
+        exit(1);
     }
 
-    // Supondo que você tenha uma validação para a senha:
     if (password.empty()) {
         std::cerr << "Password is not set" << std::endl;
-        exit(1); // ou outro erro apropriado
+        exit(1);
     }
 }
-
-// void Server::parsePortPass(std::string port, std::string password) {
-//     if (port.length() <= 0 || atoi(port.c_str()) <= MIN_PORT || atoi(port.c_str()) > MAX_PORT) {
-//         std::cout << "Invalid port" << std::endl;
-//         exit(1);
-//     }
-//     if (password.length() == 0) {
-//         std::cout << "Invalid Password" << std::endl;
-//         exit(1);
-//     }
-// }
 
 // creates and returns the socket address structure
 struct addrinfo *Server::socketAddress() {
@@ -77,13 +74,13 @@ void Server::initSocket() {
     server_socket = socketAddress(); // get the server address info
     if (server_socket == NULL) {
         std::cerr << "Error getting server address information" << std::endl;
-        exit(1); // Exit se não conseguir obter as informações de endereço
+        exit(1);
     }
     for (p = server_socket; p != NULL; p = p->ai_next) {
         _socketFd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         if (_socketFd < 0) {
             std::cerr << "Could not open socket" << std::endl;
-            continue; // Tenta o próximo endereço se falhar
+            continue;
         }
         setsockopt(_socketFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)); // allow address reuse
         check_returns = bind(_socketFd, p->ai_addr, p->ai_addrlen);
@@ -107,93 +104,23 @@ void Server::initSocket() {
     std::cout << _socketFd << std::endl; // log the socket file descriptor
 }
 
-// main event loop: handles incoming connections and client data using poll()
-// void Server::startMainLoop() {
-//     Manager::createMap(); // initialize the manager
-
-//     // vector to store pollfd structures for monitoring file descriptors
-//     std::vector<struct pollfd> pollfds;
-
-//     // add the listening socket to the pollfds vector
-//     struct pollfd listenFd;
-//     listenFd.fd = _socketFd;
-//     listenFd.events = POLLIN; // monitor for incoming connections
-//     listenFd.revents = 0; //IMPORTANTE
-//     pollfds.push_back(listenFd);
-
-//     while (1) {
-//         // wait for events on the monitored file descriptors
-//         int pollCount = poll(pollfds.data(), pollfds.size(), -1);
-//         if (pollCount == -1) {
-//             std::cerr << "Error polling()" << std::endl;
-//             exit(4);
-//         }
-
-//         // iterate through the pollfds vector to handle events
-//         std::vector<int> toRemove;
-
-//         for (size_t i = 0; i < pollfds.size(); ++i) {
-//             if (pollfds[i].revents & POLLIN) {
-//                 if (pollfds[i].fd == _socketFd) {
-//                     // Accept a new connection
-//                     struct sockaddr_storage address;
-//                     socklen_t addrlen = sizeof(address);
-//                     int newFd = accept(_socketFd, (struct sockaddr *)&address, &addrlen);
-//                     if (newFd == -1) {
-//                         std::cerr << "Error accepting connection" << std::endl;
-//                     } else {
-//                         // Add new connection to pollfds
-//                         struct pollfd clientFd;
-//                         clientFd.fd = newFd;
-//                         clientFd.events = POLLIN;
-//                         clientFd.revents = 0;
-//                         pollfds.push_back(clientFd);
-//                         acceptedConnection(newFd); // handle new connection
-//                     }
-//                 } else {
-//                     // Handle client data
-//                     handleData(pollfds[i].fd);
-
-//                     // If the client disconnected, mark for removal
-//                     if (!Manager::isClient(pollfds[i].fd)) {
-//                         toRemove.push_back(i); // Mark for removal after iteration
-//                         continue; // Skip to the next iteration
-//                     }
-                    
-//                 }
-//             }
-//         }
-
-//         // Now, remove the disconnected clients from pollfds
-//         for (size_t i = 0; i < toRemove.size(); ++i) {
-//             close(pollfds[toRemove[i]].fd);
-//             pollfds.erase(pollfds.begin() + toRemove[i]);
-//         }
-//     }
-// }
-
 void Server::startMainLoop() {
-    Manager::createMap(); // initialize the manager
-
-    // vector to store pollfd structures for monitoring file descriptors
-    std::vector<struct pollfd> pollfds;
-
-    // add the listening socket to the pollfds vector
+    // Add the listening socket to the pollfds vector
     struct pollfd listenFd;
     listenFd.fd = _socketFd;
-    listenFd.events = POLLIN; // monitor for incoming connections
-    listenFd.revents = 0;     // explicitly initialize revents
+    listenFd.events = POLLIN; // Monitor for incoming connections
+    listenFd.revents = 0;     // Explicitly initialize revents
     pollfds.push_back(listenFd);
 
     while (1) {
-        // wait for events on the monitored file descriptors
+        // Wait for events on the monitored file descriptors
         int pollCount = poll(pollfds.data(), pollfds.size(), -1);
         if (pollCount == -1) {
             std::cerr << "Error polling()" << std::endl;
             exit(4);
         }
 
-        // iterate through the pollfds vector to handle events
+        // Iterate through the pollfds vector to handle events
         std::vector<int> toRemove;
 
         for (size_t i = 0; i < pollfds.size(); ++i) {
@@ -212,7 +139,7 @@ void Server::startMainLoop() {
                         clientFd.events = POLLIN;
                         clientFd.revents = 0;
                         pollfds.push_back(clientFd);
-                        acceptedConnection(newFd); // handle new connection
+                        acceptedConnection(newFd); // Handle new connection
                     }
                 } else {
                     // Check if the client still exists
@@ -238,4 +165,34 @@ void Server::startMainLoop() {
             pollfds.erase(pollfds.begin() + toRemove[i]);
         }
     }
+}
+
+void Server::cleanup() {
+    std::cout << "Cleaning up server resources..." << std::endl;
+
+    // Close all sockets in the pollfds vector
+    for (size_t i = 0; i < pollfds.size(); ++i) {
+        if (pollfds[i].fd != -1) {
+            close(pollfds[i].fd);
+        }
+    }
+
+    // Clear the pollfds vector
+    pollfds.clear();
+    // Force the vector to release its memory by swapping with an empty vector
+    std::vector<struct pollfd>().swap(pollfds);
+
+    std::cout << "Cleanup complete." << std::endl;
+}
+
+void Server::signalHandler(int sig) {
+    std::cout << "Signal received: " << sig << std::endl;
+
+    // Call the cleanup method on the current instance
+    if (instance) {
+        instance->cleanup();
+    }
+
+    std::cout << "Exiting program..." << std::endl;
+    exit(sig); // Exit the program
 }

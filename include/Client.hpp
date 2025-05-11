@@ -13,13 +13,15 @@ class Client{
 		std::vector<std::string> _cmd;
 		std::string _channel;
 		std::string _hostname;
+		// DEBUG PASSWORD
+		bool _authenticated;
 
     public:
 		Client(){};
-        Client(int id);
+    Client(int id);
 		Client(const Client &src);
 		Client &operator=(const Client &src);
-        ~Client();
+    ~Client();
 
 		//Getters
 		std::string       &getChannel() ;
@@ -39,6 +41,10 @@ class Client{
 		void setHostName(std::string hostname);
 		void setCommand(std::string cmd);
 		void setregularCommand(std::string cmd);
+
+		// DEBUG PASSWORD
+		void setAuthenticated(bool value);
+		bool isAuthenticated() const;
 };
 
 

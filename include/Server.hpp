@@ -16,6 +16,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <poll.h>
+#include <signal.h>
 
 #include "HexchatMsg.hpp"
 #include "Manager.hpp"
@@ -46,6 +47,7 @@ class Server {
         int _socketFd;     // listening socket file descriptor
         std::vector<struct pollfd> pollfds; // vector to store pollfd structures for monitoring file descriptors
         int _maxFd;        // maximum file descriptor value
+        static Server *instance;
 
         // private methods for internal server operations
         void parsePortPass(); // validates the port and password
@@ -58,6 +60,8 @@ class Server {
         void handleMessage(int i); // processes a message from a client
         // void handleMessage(int fd, const std::string &message); // processes a message from a client
         void handleClientDisconnection(int fd, int nbrBytes);
+        bool validateClient(int fd);
+        void removeClientFromPollfds(int fd);
 
     public:
         // constructor and destructor
@@ -67,6 +71,8 @@ class Server {
         // public utility methods
         void parsePortPass(std::string port, std::string password); // validates the port and password
         std::vector<std::string> divideString(const std::string &str, char delim); // splits a string into tokens
+        void cleanup(); // Cleans up server resources
+        static void signalHandler(int sig); // Static signal handler
 };
 
 #endif

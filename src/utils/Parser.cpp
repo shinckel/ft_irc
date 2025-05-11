@@ -55,63 +55,71 @@ int Parser::nickParse(Client &client) {
     return 1;
 }
 
-int Parser::joinParse(Client &client)
-{
+int Parser::joinParse(Client &client) {
+    // Check if the client is fully registered (has both NICK and USER)
+    if (client.getNickName().empty() || client.getUserName().empty()) {
+        Manager::sendIrcMessage(client.getId(), Manager::formatMessage(client, "451") + " JOIN :You must register before joining a channel");
+        return 0;
+    }
+
     std::vector<std::string> command = client.getCommand();
     std::string channelName = "";
     std::string pass = "";
-    if (command.size() < 2){
+
+    if (command.size() < 2) {
         Manager::sendIrcMessage(client.getId(), Manager::formatMessage(client, NEEDMOREPARAMS) + " JOIN ERROR :Not enough parameters");
         return 0;
     }
+
     if ((int)command[1].find(" ") >= 0) {
         pass = command[1].substr(command[1].find(" ") + 1, command[1].size());
         channelName = command[1].substr(0, command[1].find(" "));
-    }
-    else
+    } else {
         channelName = command[1];
+    }
 
-
-    // too many channels
-    if ((int)command[1].find(",") != -1){
+    // Too many channels
+    if ((int)command[1].find(",") != -1) {
         Manager::sendIrcMessage(client.getId(), Manager::formatMessage(client, TOOMANYCHANNELS) + " :Too many channels");
         return 0;
     }
-    //check channel name for # and spaces
-    if (command[1][0] != '#' || (int)channelName.find(" ") >= 0){
+
+    // Check channel name for # and spaces
+    if (command[1][0] != '#' || (int)channelName.find(" ") >= 0) {
         Manager::sendIrcMessage(client.getId(), Manager::formatMessage(client, BADCHANNELNAME) + " :Bad channel name");
         return 0;
     }
-    //no nick cant join
-    if (client.getNickName() == ""){
-        Manager::sendIrcMessage(client.getId(), Manager::formatMessage(client, ERRONEUSNICKNAME) + " :Can't join without Nickname");
-        return 0;
-    }
-    if (Manager::getChannels().find(channelName) != Manager::getChannels().end()){
-        //check modes
-        //Check if the client is already in the channel
+
+    if (Manager::getChannels().find(channelName) != Manager::getChannels().end()) {
+        // Check modes
+        // Check if the client is already in the channel
         if (Manager::getChannels().find(channelName)->second.checkClient(client.getId())) {
             Manager::sendIrcMessage(client.getId(), Manager::formatMessage(client, ERR_ALREADYREGISTERED) + " " + channelName + " :You're already in that channel");
             return 0;
         }
+
         Channel &target = Manager::getChannels().find(channelName)->second;
-        //check if pass is correct
+
+        // Check if pass is correct
         if (target.getKey().size() && target.getKey() != pass) {
             std::cout << "pass = " << target.getKey() << "; trying pass: " << pass << std::endl;
             Manager::sendIrcMessage(client.getId(), Manager::formatMessage(client, BADCHANNELKEY) + " :Bad channel key");
             return 0;
         }
-        //check if is invited
+
+        // Check if is invited
         if (target.getModeI() && !target.IsInvited(client.getId())) {
             Manager::sendIrcMessage(client.getId(), Manager::formatMessage(client, INVITEONLYCHAN) + " :Invited only channel");
             return 0;
         }
-        //check if is full
+
+        // Check if is full
         if (target.getModeL() && target.howManyClients() >= target.getModeL()) {
             Manager::sendIrcMessage(client.getId(), Manager::formatMessage(client, CHANNELISFULL) + " :Channel is full");
             return 0;
         }
     }
+
     return 1;
 }
 

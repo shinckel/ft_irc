@@ -63,75 +63,118 @@ void Server::acceptedConnection(int newFd) {
     }
 }
 
-/* handle data from a client by filling the buffer */
-void Server::handleData(int fd) {
-    // check if the client has quit
+bool Server::validateClient(int fd) {
     if (!Manager::isClient(fd)) {
-        std::cerr << "Error: Attempted to handle data for a non-existent client (fd: " << fd << ")" << std::endl;
-        close(fd);           // close the socket
-        return;
+        std::cerr << "Error: Client with fd " << fd << " does not exist. Cleaning up..." << std::endl;
+        close(fd); // Close the socket
+        removeClientFromPollfds(fd); // Remove from pollfds
+        return false;
     }
+    return true;
+}
 
-    int nbrBytes;          // number of bytes received
-    char buffer[BUFFER_SIZE]; // buffer to store received data
-
-    bzero(buffer, sizeof(buffer)); // clear the buffer
-
-    // check for errors or client disconnection
-    nbrBytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
-    if (nbrBytes <= 0) {
-        if (nbrBytes == 0) {
-            // client disconnected
-            std::cout << "Client with socket " << fd << " disconnected" << std::endl;
-            Manager::removeClientFromChannels(*Manager::getClientByID(fd)); // remove client from channels
-            Manager::removeClient(fd); // remove client from the manager
-        } else {
-            std::cout << "Random receive error" << std::endl;
-        }
-        close(fd); // close the socket
-    } else {
-        // Obtenha a referência para o buffer do cliente
-        std::stringstream &clientBuffer = Manager::getClientBuffer(fd);
-
-        // Concatene os dados recebidos no buffer do cliente
-        clientBuffer.str(clientBuffer.str() + buffer); // corrige a concatenação com o buffer
-
-        // Encontre a posição do primeiro '\n' (quebra de linha)
-        int newLine = clientBuffer.str().find('\n');
-        while (newLine >= 0) {
-            // Processa a mensagem até o '\n'
-            std::string temp = clientBuffer.str().substr(newLine + 1); // pega o restante dos dados
-            clientBuffer.str(clientBuffer.str().substr(0, newLine + 1)); // corta o buffer até a linha
-
-            std::cout << "[" << fd << "]" << clientBuffer.str(); // exibe o buffer processado
-
-            handleMessage(fd); // chama a função para tratar o comando/mensagem
-
-            // Atualiza o buffer com os dados restantes
-            clientBuffer.str(temp); // restabelece o buffer com o restante dos dados
-            newLine = clientBuffer.str().find('\n'); // procura por outro '\n' no restante
+void Server::removeClientFromPollfds(int fd) {
+    for (size_t i = 0; i < pollfds.size(); ++i) {
+        if (pollfds[i].fd == fd) {
+            pollfds.erase(pollfds.begin() + i);
+            break;
         }
     }
 }
 
-/* handle a message from a client */
-void Server::handleMessage(int fd) {
-    // sanitize the buffer to remove unwanted characters
-    std::string temp = Manager::getClientBuffer(fd).str();
-    Manager::getClientBuffer(fd).str(Parser::sanitizeBuffer(temp));
+void Server::handleData(int fd) {
+    if (!validateClient(fd)) {
+        return; // Exit early if the client is invalid
+    }
 
-    // get the client object
-    std::vector<Client>::iterator iter = Manager::getClientByID(fd);
-    Client &temporary = *Manager::getClientByID(fd);
+    int nbrBytes;          // Number of bytes received
+    char buffer[BUFFER_SIZE]; // Buffer to store received data
 
-    // set the client's command
-    temporary.setCommand(Manager::getClientBuffer(fd).str());
+    bzero(buffer, sizeof(buffer)); // Clear the buffer
 
-    // check if the command is an action or a normal message
-    if (Parser::isAction(temporary.getCommand()[0], fd) || (Manager::getClientByID(fd)->getChannel().size() && Manager::normalMsg(temporary))) {
-        Manager::runActions(*iter); // execute the action
+    // Check for errors or client disconnection
+    nbrBytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
+
+    if (nbrBytes <= 0) {
+        if (nbrBytes == 0) {
+            // Client disconnected
+            std::cout << "Client with socket " << fd << " disconnected" << std::endl;
+            Manager::removeClientFromChannels(*Manager::getClientByID(fd)); // Remove client from channels
+            Manager::removeClient(fd); // Remove client from the manager
+        }
+        close(fd); // Close the socket
+        removeClientFromPollfds(fd); // Remove from pollfds
+        return; // Exit after handling disconnection
     } else {
-        // if the client is not in a channel, send a message
+        buffer[nbrBytes] = '\0';
+
+        if (!validateClient(fd)) {
+            return; // Exit early if the client is invalid
+        }
+
+        std::stringstream &clientBuffer = Manager::getClientBuffer(fd);
+        clientBuffer.str(clientBuffer.str() + buffer);
+
+        int newLine = clientBuffer.str().find('\n');
+        while (newLine >= 0) {
+            if (!validateClient(fd)) {
+                return; // Exit early if the client is invalid
+            }
+
+            std::vector<Client>::iterator it = Manager::getClientByID(fd);
+            if (it == Manager::getClient().end()) {
+                return; // Exit if the client is not found
+            }
+            Client &client = *it;
+
+            std::string temp = clientBuffer.str().substr(newLine + 1);
+            clientBuffer.str(clientBuffer.str().substr(0, newLine + 1));
+
+            if (!client.isAuthenticated()) {
+                std::string sanitizedBuffer = clientBuffer.str();
+                size_t lastNotWhitespace = sanitizedBuffer.find_last_not_of(" \t\r\n");
+                if (lastNotWhitespace != std::string::npos) {
+                    sanitizedBuffer.erase(lastNotWhitespace + 1);
+                } else {
+                    sanitizedBuffer.clear();
+                }
+
+                if (sanitizedBuffer.substr(0, 4) == "PASS") {
+                    client.setCommand(sanitizedBuffer);
+                    Manager::passAction(client);
+                } else {
+                    Manager::sendIrcMessage(fd, ":localhost 451 * :You must authenticate using PASS first");
+                }
+            } else {
+                client.setCommand(clientBuffer.str());
+                handleMessage(fd);
+            }
+
+            // Check if the client still exists before continuing
+            if (!validateClient(fd)) {
+                return; // Exit if the client was removed
+            }
+
+            clientBuffer.str(temp);
+            newLine = clientBuffer.str().find('\n');
+        }
+    }
+}
+
+void Server::handleMessage(int fd) {
+    Client &client = *Manager::getClientByID(fd);
+
+    std::vector<std::string> command = client.getCommand();
+
+    if (command.empty()) {
+        std::cerr << "Error: Empty command received from client " << client.getId() << std::endl;
+        return;
+    }
+
+    const std::string &action = command[0];
+    if (Parser::isAction(action, fd) || (client.getChannel().size() && Manager::normalMsg(client))) {
+        Manager::runActions(client); // Execute the action for the client
+    } else {
         std::cout << "sending regular you're not in channel msg" << std::endl;
         send(fd, "You are not in a channel, please join a channel!\n", 49, 0);
     }

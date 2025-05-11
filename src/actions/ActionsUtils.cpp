@@ -2,8 +2,26 @@
 
 void Manager::passAction(Client &client) {
     std::vector<std::string> command = client.getCommand();
+    if (command.size() < 2) {
+        std::cerr << "Error: PASS command missing password for client " << client.getId() << std::endl;
+        return;
+    }
+
     std::string password = command[1];
-    setPassword(password);
+    password.erase(0, password.find_first_not_of(" \t\r\n")); // Trim leading whitespace
+    password.erase(password.find_last_not_of(" \t\r\n") + 1); // Trim trailing whitespace
+
+    std::cout << "Hexchat password: [" << password << "]" << std::endl;
+    std::cout << "Local server password: [" << _password << "]" << std::endl;
+
+    if (password == _password) {
+        client.setAuthenticated(true);
+        std::cout << "Password correct for client " << client.getId() << std::endl;
+        sendIrcMessage(client.getId(), ":localhost :now you are authenticated\r\n");
+    } else {
+        std::cout << "Incorrect password for client " << client.getId() << std::endl;
+        sendIrcMessage(client.getId(), ":localhost :Incorrect password, try again.\r\n");
+    }
 }
 
 void Manager::capAction(Client &client) {
@@ -24,14 +42,14 @@ void Manager::sendWhoMessage(const std::vector<int> &list, Client &client, std::
     for (int i = 0; i < (int)list.size(); i++) {
         std::vector<Client>::iterator it = getClientByID(list[i]);
         if (it == _clients.end())
-            continue; // cliente foi removido
+            continue; // client was removed
         Client &temp = *it;
         std::string status;
 
         if (channelName != "*") {
             std::map<std::string, Channel>::iterator it = _channels.find(channelName);
             if (it == _channels.end())
-                continue; // ou break, dependendo do caso
+                continue; // or break?
             status = it->second.IsOp(temp.getId()) ? "@" : "+";
         }
 
