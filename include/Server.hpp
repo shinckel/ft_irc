@@ -36,9 +36,6 @@
 // maximum length for names (e.g., channel or client names)
 #define MAXNAME 20
 
-// forward declaration of FileManage class
-// class FileManage;
-
 // this is the starting point: create a socket to speak to other programs using standard Unix file descriptors
 // a socket is an endpoint for communication between two machines over a network
 class Server {
@@ -61,7 +58,6 @@ class Server {
         // void handleMessage(int fd, const std::string &message); // processes a message from a client
         void handleClientDisconnection(int fd, int nbrBytes);
         bool validateClient(int fd);
-        void removeClientFromPollfds(int fd);
 
     public:
         // constructor and destructor

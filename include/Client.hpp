@@ -3,7 +3,7 @@
 
 #include "Server.hpp"
 
-class Client{
+class Client {
     private:
 		std::stringstream _buffer;
 		int _clientID;

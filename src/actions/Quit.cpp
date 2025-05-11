@@ -22,10 +22,4 @@ void Manager::quitAction(Client &client) {
 	std::cout << "Removing client " << id << " from Clients container" << std::endl;
 	removeClient(id);
 }
-// void Manager::quitAction(Client &client) {
-// 	int id = client.getId();
-// 	sendIrcMessage(id, formatMessage(client) + " QUIT :Bye!");
-// 	removeClientFromChannels(client);
-// 	sendIrcMessage(id, formatMessage(client) + " QUIT :Bye!");
-// 	removeClient(id);
-// }
+

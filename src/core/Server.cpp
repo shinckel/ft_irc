@@ -67,19 +67,9 @@ bool Server::validateClient(int fd) {
     if (!Manager::isClient(fd)) {
         std::cerr << "Error: Client with fd " << fd << " does not exist. Cleaning up..." << std::endl;
         close(fd); // Close the socket
-        removeClientFromPollfds(fd); // Remove from pollfds
         return false;
     }
     return true;
-}
-
-void Server::removeClientFromPollfds(int fd) {
-    for (size_t i = 0; i < pollfds.size(); ++i) {
-        if (pollfds[i].fd == fd) {
-            pollfds.erase(pollfds.begin() + i);
-            break;
-        }
-    }
 }
 
 void Server::handleData(int fd) {
@@ -103,28 +93,16 @@ void Server::handleData(int fd) {
             Manager::removeClient(fd); // Remove client from the manager
         }
         close(fd); // Close the socket
-        // removeClientFromPollfds(fd); // Remove from pollfds
         return; // Exit after handling disconnection
     } else {
         buffer[nbrBytes] = '\0';
-
-        // if (!validateClient(fd)) {
-        //     return; // Exit early if the client is invalid
-        // }
 
         std::stringstream &clientBuffer = Manager::getClientBuffer(fd);
         clientBuffer.str(clientBuffer.str() + buffer);
 
         int newLine = clientBuffer.str().find('\n');
         while (newLine >= 0) {
-            // if (!validateClient(fd)) {
-            //     return; // Exit early if the client is invalid
-            // }
-
             std::vector<Client>::iterator it = Manager::getClientByID(fd);
-            if (it == Manager::getClient().end()) {
-                return; // Exit if the client is not found
-            }
             Client &client = *it;
 
             std::string temp = clientBuffer.str().substr(newLine + 1);
@@ -150,10 +128,11 @@ void Server::handleData(int fd) {
                 handleMessage(fd);
             }
 
-            // Check if the client still exists before continuing
-            // if (!validateClient(fd)) {
-            //     return; // Exit if the client was removed
-            // }
+            // Check if the client still exists before continuing to read the buffer
+            // ...otherwise, leaks!!!
+            if (!validateClient(fd)) {
+                return; // Exit if the client was removed
+            }
 
             clientBuffer.str(temp);
             newLine = clientBuffer.str().find('\n');
