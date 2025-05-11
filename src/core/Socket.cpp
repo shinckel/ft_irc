@@ -105,6 +105,7 @@ void Server::initSocket() {
 }
 
 void Server::startMainLoop() {
+    Manager::createMap();
     // Add the listening socket to the pollfds vector
     struct pollfd listenFd;
     listenFd.fd = _socketFd;

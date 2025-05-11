@@ -103,23 +103,23 @@ void Server::handleData(int fd) {
             Manager::removeClient(fd); // Remove client from the manager
         }
         close(fd); // Close the socket
-        removeClientFromPollfds(fd); // Remove from pollfds
+        // removeClientFromPollfds(fd); // Remove from pollfds
         return; // Exit after handling disconnection
     } else {
         buffer[nbrBytes] = '\0';
 
-        if (!validateClient(fd)) {
-            return; // Exit early if the client is invalid
-        }
+        // if (!validateClient(fd)) {
+        //     return; // Exit early if the client is invalid
+        // }
 
         std::stringstream &clientBuffer = Manager::getClientBuffer(fd);
         clientBuffer.str(clientBuffer.str() + buffer);
 
         int newLine = clientBuffer.str().find('\n');
         while (newLine >= 0) {
-            if (!validateClient(fd)) {
-                return; // Exit early if the client is invalid
-            }
+            // if (!validateClient(fd)) {
+            //     return; // Exit early if the client is invalid
+            // }
 
             std::vector<Client>::iterator it = Manager::getClientByID(fd);
             if (it == Manager::getClient().end()) {
@@ -151,9 +151,9 @@ void Server::handleData(int fd) {
             }
 
             // Check if the client still exists before continuing
-            if (!validateClient(fd)) {
-                return; // Exit if the client was removed
-            }
+            // if (!validateClient(fd)) {
+            //     return; // Exit if the client was removed
+            // }
 
             clientBuffer.str(temp);
             newLine = clientBuffer.str().find('\n');
