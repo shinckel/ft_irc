@@ -149,10 +149,7 @@ void Server::handleMessage(int fd) {
     }
 
     const std::string &action = command[0];
-    if (Parser::isAction(action, fd) || (client.getChannel().size() && Manager::normalMsg(client))) {
+    if (Parser::isAction(action, fd)) {
         Manager::runActions(client); // Execute the action for the client
-    } else {
-        std::cout << "sending regular you're not in channel msg" << std::endl;
-        send(fd, "You are not in a channel, please join a channel!\n", 49, 0);
-    }
+    } 
 }

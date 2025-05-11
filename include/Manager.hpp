@@ -70,7 +70,6 @@ class Manager {
 
         // channel and client utilities
         static std::map<std::string, Channel> &getChannels(); // gets the map of channels
-        static int normalMsg(Client &client); // handles normal messages
         static void removeClientFromChannels(Client &client); // removes a client from all channels
 
         // client validation
