@@ -7,7 +7,7 @@ void Manager::removeClientFromChannels(Client &client) {
 			_channels.find(channelName)->second.removeClient(client.getId());
 			_channels.find(channelName)->second.channelMessage(formatMessage(client) + " QUIT: has quit\r\n");
 		}
-    }
+  }
 }
 
 void Manager::quitAction(Client &client) {

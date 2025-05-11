@@ -49,6 +49,7 @@ class Manager {
         static void inviteAction(Client &client); // handles the INVITE command
         static void topicAction(Client &client); // handles the TOPIC command
         static void modeAction(Client &client); // handles the MODE command
+        static void partAction(Client &client); // handles the PART command - leaves a channel
 
         // client actions
         static void nickAction(Client &client); // handles the NICK command

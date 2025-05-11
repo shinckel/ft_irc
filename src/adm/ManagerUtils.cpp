@@ -13,6 +13,7 @@ void Manager::createMap(void) {
     _actionMap["PASS"] = passAction;
     _actionMap["CAP"] = capAction;
     _actionMap["QUIT"] = quitAction;
+    _actionMap["PART"] = partAction;
 }
 
 std::string Manager::formatMessage(Client &client) {

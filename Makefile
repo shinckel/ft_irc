@@ -28,6 +28,7 @@ SRCS =	src/main.cpp \
 				src/actions/Quit.cpp \
 				src/actions/Topic.cpp \
 				src/actions/Who.cpp \
+				src/actions/Part.cpp \
         src/utils/Parser.cpp \
 
 CXX = c++

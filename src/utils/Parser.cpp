@@ -377,20 +377,3 @@ std::string& Parser::sanitizeBuffer(std::string& str) {
     str.erase(end + 1);
     return str;
 }
-
-// DEBUGGING
-// std::string Parser::sanitizeBuffer(const std::string &str) {
-//     static const std::string whitespace = "\t\n\r\f\v";
-
-//     // Find the first non-whitespace character
-//     size_t start = str.find_first_not_of(whitespace);
-//     if (start == std::string::npos) {
-//         return ""; // Return an empty string if the input is all whitespace
-//     }
-
-//     // Find the last non-whitespace character
-//     size_t end = str.find_last_not_of(whitespace);
-
-//     // Return the trimmed string
-//     return str.substr(start, end - start + 1);
-// }
