@@ -120,8 +120,6 @@ void Server::handleData(int fd) {
                 if (sanitizedBuffer.substr(0, 4) == "PASS") {
                     client.setCommand(sanitizedBuffer);
                     Manager::passAction(client);
-                } else {
-                    Manager::sendIrcMessage(fd, ":localhost 451 * :You must authenticate using PASS first");
                 }
             } else {
                 client.setCommand(clientBuffer.str());
