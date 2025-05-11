@@ -17,10 +17,10 @@ void Manager::passAction(Client &client) {
     if (password == _password) {
         client.setAuthenticated(true);
         std::cout << "Password correct for client " << client.getId() << std::endl;
-        sendIrcMessage(client.getId(), ":localhost :now you are authenticated\r\n");
+        sendIrcMessage(client.getId(), ":server NOTICE * :Authentication successful");
     } else {
         std::cout << "Incorrect password for client " << client.getId() << std::endl;
-        sendIrcMessage(client.getId(), ":localhost :Incorrect password, try again.\r\n");
+        sendIrcMessage(client.getId(), ":server 464 * :Password incorrect");
     }
 }
 

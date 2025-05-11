@@ -102,12 +102,11 @@ void Client::setCommand(std::string cmd) {
     }
 
     // Debug output
-    std::cout << "banana" << std::endl;
-    std::cout << "Parsed command: ";
-    for (unsigned long i = 0; i < _cmd.size(); i++) {
-        std::cout << "[" << _cmd[i] << "] ";
-    }
-    std::cout << std::endl;
+    // std::cout << "Parsed command: ";
+    // for (unsigned long i = 0; i < _cmd.size(); i++) {
+    //     std::cout << "[" << _cmd[i] << "] ";
+    // }
+    // std::cout << std::endl;
 }
 
 void Client::setregularCommand(std::string cmd) {
@@ -124,9 +123,9 @@ void Client::setChannel(std::string channel) {
 
 // DEBUG PASSWORD
 void Client::setAuthenticated(bool value) {
-    _authenticated = value;  // Define o estado de autenticação
+    _authenticated = value;
 }
 
 bool Client::isAuthenticated() const {
-    return _authenticated;  // Retorna se o cliente está autenticado
+    return _authenticated;
 }
